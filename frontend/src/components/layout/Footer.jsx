@@ -19,15 +19,14 @@ const Footer = () => {
     "Illustrations",
     "Figma",
   ];
- 
+
   return (
     <footer
       style={{
-          background:
+        background:
           "linear-gradient(180deg, rgba(11,15,25,0.75), rgba(7,9,14,0.9))",
         color: "#d1d5db",
         borderTop: "1px solid rgba(255,255,255,0.08)",
-        marginTop: "60px",
         backdropFilter: "blur(8px)",
       }}
     >
