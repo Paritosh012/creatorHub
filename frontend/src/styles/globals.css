@@ -10,3 +10,37 @@ body {
   overflow: hidden;
   overflow-y: scroll;
 }
+
+/* src/index.css (or src/App.css) */
+:root{
+  --bg-dark: #0b0f19;
+  --glass-grad: linear-gradient(180deg, rgba(11,15,25,0.96), rgba(7,9,14,1));
+  --muted: #9ca3af;
+  --soft-border: rgba(255,255,255,0.06);
+  --soft-border-strong: rgba(255,255,255,0.12);
+}
+
+/* page background */
+html, body, #root {
+  height: 100%;
+  background: var(--bg-dark);
+  color: #ffffff;
+}
+
+/* make containers transparent by default so sections control look */
+.container, .container-fluid {
+  background: transparent;
+}
+
+/* small helpers */
+.text-muted-site { color: var(--muted); }
+.card-glass {
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.006));
+  border: 1px solid var(--soft-border);
+  border-radius: 12px;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+.card-glass:hover {
+  transform: translateY(-4px);
+  border-color: var(--soft-border-strong);
+}
