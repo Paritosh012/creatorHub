@@ -1,14 +1,60 @@
-// src/components/home/PopularProducts.jsx
-import React from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { getPopularProducts } from "../../services/productApi";
 
-/**
- * PopularProducts.jsx — theme-matched version
- * Requires the global CSS variables in src/index.css (see above).
- */
+const PopularProducts = () => {
 
-const PopularProducts = ({ products = [] }) => {
+  const productsList = [
+    {
+      id: 1,
+      title: "Minimal UI Kit",
+      creator: "Asha",
+      price: 499,
+      thumbnail: "https://picsum.photos/seed/p1/500/400",
+    },
+    {
+      id: 2,
+      title: "3D Icons Pack",
+      creator: "Ravi",
+      price: 299,
+      thumbnail: "https://picsum.photos/seed/p2/500/400",
+    },
+    {
+      id: 3,
+      title: "Dashboard Template",
+      creator: "Maya",
+      price: 0,
+      thumbnail: "httpsum.photos/seed/p3/500/400",
+    },
+    {
+      id: 4,
+      title: "Figma Wireframe Kit",
+      creator: "Dev",
+      price: 199,
+      thumbnail: "https://picsum.photos/seed/p4/500/400",
+    },
+  ];
+
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      
+      try {
+        setLoading(true);
+        let res = await getPopularProducts()
+        setProducts(res.data);
+      } catch {
+        setProducts(productsList);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
+
   return (
     <section
       aria-label="Popular assets"
@@ -28,7 +74,7 @@ const PopularProducts = ({ products = [] }) => {
           Hand-picked digital assets trending on CreatorHub.
         </p>
 
-        {(!products || products.length === 0) ? (
+        {!products || products.length === 0 ? (
           <EmptyState />
         ) : (
           <Row className="g-4">
@@ -60,7 +106,13 @@ const ProductCard = ({ product }) => {
       }}
     >
       {/* image wrapper (preserves ratio, rounded corners handled by overflow) */}
-      <div style={{ position: "relative", paddingTop: "60%", background: "rgba(255,255,255,0.01)" }}>
+      <div
+        style={{
+          position: "relative",
+          paddingTop: "60%",
+          background: "rgba(255,255,255,0.01)",
+        }}
+      >
         <img
           src={thumbnail || `https://picsum.photos/seed/p-${id}/800/560`}
           alt={title}
@@ -89,7 +141,13 @@ const ProductCard = ({ product }) => {
           {title}
         </Card.Title>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
           <div style={{ color: "var(--muted)", fontSize: 13 }}>{creator}</div>
           <div style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>
             {price === 0 ? "Free" : `₹${price}`}
@@ -106,13 +164,16 @@ const EmptyState = () => (
     style={{
       borderRadius: 12,
       padding: 28,
-      background: "linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))",
+      background:
+        "linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))",
       border: "1px solid rgba(255,255,255,0.04)",
       color: "var(--muted)",
       textAlign: "center",
     }}
   >
-    <div style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 6 }}>
+    <div
+      style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 6 }}
+    >
       No products found
     </div>
     <div style={{ fontSize: 14 }}>

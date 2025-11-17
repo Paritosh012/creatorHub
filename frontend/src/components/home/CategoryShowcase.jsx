@@ -1,12 +1,7 @@
-import React from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
-/**
- * CategoryShowcase.jsx
- * Premium dark-glass category section for the homepage.
- * No logic — purely UI, matches CreatorHub theme.
- */
+import { useEffect, useState } from "react";
+import { getCategory } from "../../services/productApi";
 
 const categories = [
   { id: 1, name: "UI Kits", icon: "🎨", slug: "ui-kits" },
@@ -18,6 +13,23 @@ const categories = [
 ];
 
 const CategoryShowcase = () => {
+  const [loading, setLoading] = useState(true);
+  const [category, setCategory] = useState([]);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        let res = await getCategory();
+        setCategory(res.data);
+      } catch {
+        setCategory(categories);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProducts();
+  }, []);
   return (
     <section style={{ paddingTop: 56, paddingBottom: 56 }}>
       <Container>
@@ -32,7 +44,7 @@ const CategoryShowcase = () => {
 
         {/* Grid */}
         <Row className="g-4">
-          {categories.map((cat) => (
+          {category.map((cat) => (
             <Col key={cat.id} xs={12} sm={6} md={4} lg={4}>
               <Card
                 as={Link}
