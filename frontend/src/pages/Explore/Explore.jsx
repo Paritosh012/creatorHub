@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Container, Row, Col, Form, Button, Spinner } from "react-bootstrap";
 import ProductCard from "../../components/product/ProductCard";
 import { getAllProducts } from "../../services/productApi";
 
@@ -275,12 +275,31 @@ const Explore = () => {
   const [allProducts, setAllProducts] = useState([]);
   const [products, setProducts] = useState([]);
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // 1) Fetch ALL products once
   useEffect(() => {
     const fetchAll = async () => {
       try {
         const res = await getAllProducts();
+        setAllProducts(res.data);
+        setProducts(res.data);
+      } catch (err) {
+        setProducts(mockData);
+        setAllProducts(mockData);
+        console.log(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAll();
+  }, []);
+
+  useEffect(() => {
+    const fetchAll = async () => {
+      try {
+        const res = await getAllProducts();
+        setLoading(true);
         setAllProducts(res.data);
         setProducts(res.data);
       } catch (err) {
@@ -293,7 +312,6 @@ const Explore = () => {
     fetchAll();
   }, []);
 
-  // 2) Search filter (simple)
   const handleSearch = () => {
     if (!query.trim()) {
       setProducts(allProducts);
@@ -307,10 +325,16 @@ const Explore = () => {
     setProducts(filtered);
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    }
+  };
+
   return (
     <main style={{ paddingTop: 40, paddingBottom: 40 }}>
       <Container>
-        {/* Search Bar */}
         <div className="d-flex gap-2 mb-4" style={{ alignItems: "center" }}>
           <Form.Control
             placeholder="Search assets..."
@@ -321,6 +345,7 @@ const Explore = () => {
             }}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyPress}
           />
 
           <Button
@@ -332,7 +357,6 @@ const Explore = () => {
           </Button>
         </div>
 
-        {/* Product Grid */}
         <Row className="g-4">
           {products.length > 0 ? (
             products.map((item) => (
@@ -340,6 +364,8 @@ const Explore = () => {
                 <ProductCard product={item} />
               </Col>
             ))
+          ) : loading ? (
+            <Spinner animation="grow" variant="light" />
           ) : (
             <div
               style={{
