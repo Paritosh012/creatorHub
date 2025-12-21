@@ -3,53 +3,47 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { getPopularProducts } from "../../services/productApi";
 
-const PopularProducts = () => {
+const productsList = [
+  {
+    id: 1,
+    title: "Minimal UI Kit",
+    creator: "Asha",
+    price: 499,
+    thumbnail: "https://picsum.photos/seed/p1/500/400",
+  },
+  {
+    id: 2,
+    title: "3D Icons Pack",
+    creator: "Ravi",
+    price: 299,
+    thumbnail: "https://picsum.photos/seed/p2/500/400",
+  },
+  {
+    id: 3,
+    title: "Dashboard Template",
+    creator: "Maya",
+    price: 0,
+    thumbnail: "https://picsum.photos/seed/p3/500/400",
+  },
+  {
+    id: 4,
+    title: "Figma Wireframe Kit",
+    creator: "Dev",
+    price: 199,
+    thumbnail: "https://picsum.photos/seed/p4/500/400",
+  },
+];
 
-  const productsList = [
-    {
-      id: 1,
-      title: "Minimal UI Kit",
-      creator: "Asha",
-      price: 499,
-      thumbnail: "https://picsum.photos/seed/p1/500/400",
-    },
-    {
-      id: 2,
-      title: "3D Icons Pack",
-      creator: "Ravi",
-      price: 299,
-      thumbnail: "https://picsum.photos/seed/p2/500/400",
-    },
-    {
-      id: 3,
-      title: "Dashboard Template",
-      creator: "Maya",
-      price: 0,
-      thumbnail: "httpsum.photos/seed/p3/500/400",
-    },
-    {
-      id: 4,
-      title: "Figma Wireframe Kit",
-      creator: "Dev",
-      price: 199,
-      thumbnail: "https://picsum.photos/seed/p4/500/400",
-    },
-  ];
-
-  const [loading, setLoading] = useState(true);
+  const PopularProducts = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
-      
       try {
-        setLoading(true);
-        let res = await getPopularProducts()
-        setProducts(res.data);
+        let res = await getPopularProducts();
+        setProducts(response.data.products);
       } catch {
         setProducts(productsList);
-      } finally {
-        setLoading(false);
       }
     };
     fetchProducts();
@@ -59,20 +53,37 @@ const PopularProducts = () => {
     <section
       aria-label="Popular assets"
       style={{
-        // keep section transparent; global background handles dark tone
         paddingTop: 56,
         paddingBottom: 56,
         background: "transparent",
       }}
     >
       <Container>
-        <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: 8 }}>
-          Popular Assets
-        </h2>
-
-        <p style={{ color: "var(--muted)", marginBottom: 24, fontSize: 14 }}>
-          Hand-picked digital assets trending on CreatorHub.
-        </p>
+        <Row className="align-items-center mb-3">
+          <Col>
+            <h2 style={{ color: "#fff", fontWeight: 800 }}>
+              Trending This Week
+            </h2>
+            <p
+              style={{ color: "var(--muted)", marginBottom: 24, fontSize: 14 }}
+            >
+              Hand-picked digital assets trending on CreatorHub.
+            </p>
+          </Col>
+          <Col xs="auto">
+            <Link
+              to="/explore"
+              style={{
+                color: "#06b6d4",
+                fontWeight: 700,
+                textDecoration: "none",
+                fontSize: 14,
+              }}
+            >
+              View all →
+            </Link>
+          </Col>
+        </Row>
 
         {!products || products.length === 0 ? (
           <EmptyState />
@@ -103,6 +114,7 @@ const ProductCard = ({ product }) => {
         overflow: "hidden",
         color: "inherit",
         textDecoration: "none",
+        transition: "transform 0.2s ease, border-color 0.2s ease",
       }}
     >
       {/* image wrapper (preserves ratio, rounded corners handled by overflow) */}

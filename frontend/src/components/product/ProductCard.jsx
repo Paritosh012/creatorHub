@@ -1,7 +1,10 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
+
 import { Card, Badge } from "react-bootstrap";
 
 const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
+
   if (!product) return null;
 
   const isFree = product.price === 0;
@@ -27,6 +30,7 @@ const ProductCard = ({ product }) => {
         e.currentTarget.style.transform = "translateY(0)";
         e.currentTarget.style.border = "1px solid rgba(255,255,255,0.05)";
       }}
+      onClick={() => navigate(`/product/${product.slug}`)}
     >
       {/* Thumbnail + overlay */}
       <div style={{ width: "100%", height: 170, position: "relative" }}>

@@ -5,7 +5,7 @@ require("dotenv").config();
 
 const registerUser = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body;
+    let { name, email, password, role } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ success: false, error: "Missing fields" });
@@ -68,7 +68,7 @@ const loginUser = async (req, res) => {
 
     email = email.toLowerCase().trim();
 
-    const user = await User.findOne({ email });
+    const user = await userModel.findOne({ email });
     if (!user) {
       return res
         .status(401)
@@ -107,9 +107,8 @@ const loginUser = async (req, res) => {
 };
 
 const me = async (req, res) => {
-  const User = require("../models/userModel");
   try {
-    const user = await User.findById(req.user.id).select("-password");
+    const user = await userModel.findById(req.user.id).select("-password");
     if (!user)
       return res.status(404).json({ success: false, error: "User not found" });
     return res.status(200).json({ success: true, user });
