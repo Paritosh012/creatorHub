@@ -1,9 +1,6 @@
 import api from "./api";
 
-// Popular products
-export const getPopularProducts = () => {
-  return api.get("/products?popular=true");
-};
+ 
 
 // All products
 export const getAllProducts = () => {
