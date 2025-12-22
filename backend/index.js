@@ -8,9 +8,13 @@ const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
 const adminRoutes = require("./routes/adminRoutes");
 const userRoutes = require("./routes/userRoutes");
- 
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://creator-hub-82iz.vercel.app"],
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
