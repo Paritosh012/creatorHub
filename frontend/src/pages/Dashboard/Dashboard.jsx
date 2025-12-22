@@ -1,67 +1,159 @@
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import { Container, Row, Col, Card, Button, Spinner } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Spinner,
+  Modal,
+  Form,
+} from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { Modal, Form } from "react-bootstrap";
 import { toast } from "react-toastify";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
 
   const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+
   const [form, setForm] = useState({
     title: "",
     price: "",
     category: "ui-kits",
     thumbnail: "",
+    fileUrl: "",
     description: "",
   });
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
+  /* ---------------- FETCH PRODUCTS ---------------- */
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await api.get("/products/creator");
+        setProducts(res.data.products || []);
+      } catch {
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  /* ---------------- CREATE ---------------- */
   const handleCreateProduct = async () => {
+    if (
+      !form.title ||
+      !form.thumbnail ||
+      !form.fileUrl ||
+      !form.description.trim()
+    ) {
+      toast.error("All fields are required");
+      return;
+    }
+
     try {
-      await api.post("/users/dashboard/create", {
+      const priceValue = Number(form.price || 0);
+
+      const res = await api.post("/users/dashboard/create", {
         title: form.title,
-        slug: form.title.toLowerCase().replace(/\s+/g, "-"),
-        price: form.price,
+        description: form.description,
+        price: priceValue,
+        isFree: priceValue === 0,
         category: form.category,
         thumbnail: form.thumbnail,
-        description: form.description,
+        fileUrl: form.fileUrl,
         tags: [form.category],
-        downloads: 0,
       });
 
-      if (res.data.success) {
-        toast.success("Product uploaded 🚀");
-        setShowModal(false);
+      toast.success("Product uploaded 🚀");
 
-        // refresh product list
-        setProducts((prev) => [res.data.product, ...prev]);
-
-        // reset form
-        setForm({
-          title: "",
-          price: "",
-          category: "ui-kits",
-          thumbnail: "",
-          description: "",
-        });
-      }
+      setProducts((prev) => [res.data.product, ...prev]);
+      closeModal();
     } catch (err) {
-      toast.error("Failed to upload product");
+      toast.error(err.response?.data?.msg || "Upload failed");
     }
   };
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  /* ---------------- EDIT ---------------- */
+  const handleEditOpen = (product) => {
+    setEditingId(product._id);
+    setForm({
+      title: product.title,
+      price: product.price,
+      category: product.category,
+      thumbnail: product.thumbnail,
+      fileUrl: product.fileUrl,
+      description: product.description,
+    });
+    setShowModal(true);
+  };
 
-  useEffect(() => {
-    api
-      .get("/products/creator")
-      .then((res) => setProducts(res.data.products))
-      .finally(() => setLoading(false));
-  }, []);
+  const handleUpdateProduct = async () => {
+    try {
+      const priceValue = Number(form.price || 0);
 
+      const res = await api.put(`/products/${editingId}`, {
+        title: form.title,
+        description: form.description,
+        price: priceValue,
+        isFree: priceValue === 0,
+        category: form.category,
+        thumbnail: form.thumbnail,
+        fileUrl: form.fileUrl,
+        tags: [form.category],
+      });
+
+      toast.success("Product updated");
+
+      setProducts((prev) =>
+        prev.map((p) => (p._id === editingId ? res.data.product : p))
+      );
+
+      closeModal();
+    } catch {
+      toast.error("Update failed");
+    }
+  };
+
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
+    try {
+      await api.delete(`/products/${id}`);
+      toast.success("Product deleted");
+
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  /* ---------------- MODAL RESET ---------------- */
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingId(null);
+    setForm({
+      title: "",
+      price: "",
+      category: "ui-kits",
+      thumbnail: "",
+      fileUrl: "",
+      description: "",
+    });
+  };
+
+  /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
       <div className="d-flex justify-content-center mt-5">
@@ -70,13 +162,13 @@ const Dashboard = () => {
     );
   }
 
+  /* ---------------- UI ---------------- */
   return (
     <Container style={{ paddingTop: 40 }}>
       <h2 style={{ color: "#fff", fontWeight: 800 }}>
         Welcome, {user?.name || "Creator"}
       </h2>
-
-      <p style={{ color: "#9ca3af" }}>Manage your products and activity</p>
+      <p style={{ color: "#9ca3af" }}>Manage your products</p>
 
       {/* STATS */}
       <Row className="g-4 mt-3">
@@ -86,14 +178,12 @@ const Dashboard = () => {
             <h3>{products.length}</h3>
           </Card>
         </Col>
-
         <Col md={4}>
           <Card className="p-3 bg-dark border-secondary">
             <h6>Total Downloads</h6>
-            <h3>{products.reduce((sum, p) => sum + (p.downloads || 0), 0)}</h3>
+            <h3>{products.reduce((s, p) => s + (p.downloads || 0), 0)}</h3>
           </Card>
         </Col>
-
         <Col md={4}>
           <Card className="p-3 bg-dark border-secondary">
             <h6>Status</h6>
@@ -105,7 +195,6 @@ const Dashboard = () => {
       {/* ACTIONS */}
       <div className="d-flex gap-2 mt-4">
         <Button onClick={() => setShowModal(true)}>Add New Product</Button>
-
         <Button variant="outline-light" onClick={() => navigate("/explore")}>
           Explore Marketplace
         </Button>
@@ -133,15 +222,37 @@ const Dashboard = () => {
                   <p style={{ color: "#9ca3af", fontSize: 13 }}>
                     {p.price === 0 ? "Free" : `₹${p.price}`}
                   </p>
+
+                  <div className="d-flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline-light"
+                      onClick={() => handleEditOpen(p)}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={() => handleDeleteProduct(p._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </Card.Body>
               </Card>
             </Col>
           ))}
         </Row>
       )}
-      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+
+      {/* MODAL */}
+      <Modal show={showModal} onHide={closeModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Upload New Product</Modal.Title>
+          <Modal.Title>
+            {editingId ? "Edit Product" : "Upload New Product"}
+          </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -180,6 +291,13 @@ const Dashboard = () => {
             />
 
             <Form.Control
+              className="mb-2"
+              placeholder="Download file URL"
+              value={form.fileUrl}
+              onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
+            />
+
+            <Form.Control
               as="textarea"
               rows={3}
               placeholder="Product description"
@@ -192,10 +310,14 @@ const Dashboard = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowModal(false)}>
+          <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button onClick={handleCreateProduct}>Upload</Button>
+          <Button
+            onClick={editingId ? handleUpdateProduct : handleCreateProduct}
+          >
+            {editingId ? "Update" : "Upload"}
+          </Button>
         </Modal.Footer>
       </Modal>
     </Container>

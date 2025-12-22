@@ -1,12 +1,5 @@
 import "../../styles/Footer.css";
-import {
-  Navbar,
-  Nav,
-  Container,
-  Form,
-  Button,
-  InputGroup,
-} from "react-bootstrap";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
@@ -74,7 +67,7 @@ const SiteNavbar = () => {
             </Nav.Link>
 
             {isLoggedIn && (
-              <Nav.Link as={Link} to="/creator">
+              <Nav.Link as={Link} to="/dashboard">
                 Creator
               </Nav.Link>
             )}
@@ -83,9 +76,7 @@ const SiteNavbar = () => {
           <div
             className="d-none d-lg-flex align-items-center"
             style={{ gap: 10, marginLeft: 10 }}
-          >
-            
-          </div>
+          ></div>
 
           <div className="ms-3 d-flex align-items-center" style={{ gap: 8 }}>
             {isLoggedIn ? (
