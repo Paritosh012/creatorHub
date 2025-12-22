@@ -118,4 +118,21 @@ const me = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, me };
+const becomeCreator = async (req, res) => {
+  try {
+    const user = await userModel.findByIdAndUpdate(
+      req.user.id,
+      { role: "creator" },
+      { new: true }
+    );
+
+    res.json({
+      success: true,
+      user,
+    });
+  } catch (err) {
+    res.status(500).json({ success: false });
+  }
+};
+
+module.exports = { registerUser, loginUser, me ,becomeCreator};

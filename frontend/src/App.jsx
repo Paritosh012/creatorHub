@@ -8,6 +8,10 @@ import Register from "./pages/Auth/Register";
 import ProductDetails from "./components/product/ProductsDetails";
 import Checkout from "./pages/Checkout/Checkout";
 import Success from "./pages/Checkout/Success";
+import Admin from "./pages/Admin/Admin";
+import Creator from "./pages/Creator/Creator";
+import "react-toastify/dist/ReactToastify.css";
+import Dashboard from "./pages/Dashboard/Dashboard";
 
 const App = () => {
   return (
@@ -23,6 +27,9 @@ const App = () => {
             <Route path="/product/:slug" element={<ProductDetails />} />
             <Route path="/checkout" element={<Checkout />} />
             <Route path="/success" element={<Success />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="/creator" element={<Creator />} />
+            <Route path="/dashboard" element={<Dashboard />} />
           </Route>
         </Routes>
         <Routes>

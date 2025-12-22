@@ -1,7 +1,7 @@
-import axios from "axios";
 import { useState } from "react";
 import { Container, Form, Button, Card } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import api from "../../services/api";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,10 +12,9 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    let api = `http://localhost:8000/api/auth/register`;
     try {
       if (name && email && password) {
-        let res = await axios.post(api, {
+        let res = await api.post("/auth/register", {
           name,
           email,
           password,
@@ -24,6 +23,7 @@ const Register = () => {
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("user", JSON.stringify(res.data.user));
           navigate("/");
+          window.location.reload();
         }
       }
     } catch (err) {

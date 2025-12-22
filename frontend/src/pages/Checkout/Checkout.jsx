@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, Container, Spinner, Toast } from "react-bootstrap";
+import { Button, Container, Spinner } from "react-bootstrap";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 const Checkout = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
 
   const [processing, setProcessing] = useState(false);
-  const [showToast, setShowToast] = useState(false);
 
   if (!state) return <p>No product selected</p>;
 
@@ -17,9 +17,9 @@ const Checkout = () => {
     // fake payment delay
     setTimeout(() => {
       setProcessing(false);
-      setShowToast(true);
 
-      // redirect after toast
+      toast.success("Payment successful 🎉");
+
       setTimeout(() => {
         navigate("/success");
       }, 1500);
@@ -65,24 +65,6 @@ const Checkout = () => {
           )}
         </Button>
       </div>
-
-      {/* TOAST */}
-      <Toast
-        show={showToast}
-        onClose={() => setShowToast(false)}
-        delay={1500}
-        autohide
-        style={{
-          position: "fixed",
-          bottom: 20,
-          right: 20,
-          background: "rgba(0,0,0,0.85)",
-          color: "#fff",
-          borderRadius: 10,
-        }}
-      >
-        <Toast.Body>Payment successful 🎉</Toast.Body>
-      </Toast>
     </Container>
   );
 };

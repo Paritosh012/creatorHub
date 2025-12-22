@@ -4,15 +4,20 @@ const mongoose = require("mongoose");
 require("dotenv").config();
 const port = process.env.PORT || 8000;
 const cors = require("cors");
-const userRoutes = require("./routes/auth.routes");
+const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
+const adminRoutes = require("./routes/adminRoutes");
+const userRoutes = require("./routes/userRoutes");
+ 
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/auth", userRoutes);
+app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
 
 app.use((err, req, res, next) => {
   console.error(err);

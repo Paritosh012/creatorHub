@@ -1,28 +1,44 @@
 import "../../styles/Footer.css";
-
 import {
   Navbar,
   Nav,
   Container,
-  NavDropdown,
   Form,
   Button,
   InputGroup,
 } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 const SiteNavbar = () => {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const location = useLocation();
+  const user = localStorage.getItem("user");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, [location.pathname]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    navigate("/login");
+  };
+
   return (
     <Navbar
       expand="lg"
       variant="dark"
+      sticky="top"
       style={{
         background:
           "linear-gradient(180deg, rgba(11,15,25,0.75), rgba(7,9,14,0.9))",
         backdropFilter: "saturate(120%) blur(6px)",
         borderBottom: "1px solid rgba(255,255,255,0.04)",
       }}
-      sticky="top"
     >
       <Container fluid="lg">
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
@@ -50,70 +66,76 @@ const SiteNavbar = () => {
           </div>
         </Navbar.Brand>
 
-        <Navbar.Toggle aria-controls="main-nav" />
-
-        <Navbar.Collapse id="main-nav">
+        <Navbar.Toggle />
+        <Navbar.Collapse>
           <Nav className="me-auto align-items-lg-center" style={{ gap: 12 }}>
             <Nav.Link as={Link} to="/explore">
               Explore
             </Nav.Link>
-            <Nav.Link as={Link} to="/pricing">
-              Pricing
-            </Nav.Link>
-            <Nav.Link as={Link} to="/creators">
-              Creators
-            </Nav.Link>
 
-         
+            {isLoggedIn && (
+              <Nav.Link as={Link} to="/creator">
+                Creator
+              </Nav.Link>
+            )}
           </Nav>
 
-          {/* Search (no logic) */}
           <div
             className="d-none d-lg-flex align-items-center"
             style={{ gap: 10, marginLeft: 10 }}
           >
-            <InputGroup style={{ minWidth: 280 }}>
-              <Form.Control className="search"
-                placeholder="Search assets, creators..."
-                aria-label="Search"
-                style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.04)",
-                  color: "#e6edf3",
-                }}
-                // no onChange provided (no logic)
-              />
-              <Button
-                variant="outline-light"
-                style={{ borderColor: "rgba(255,255,255,0.04)" }}
-                // no onClick provided (no logic)
-              >
-                Search
-              </Button>
-            </InputGroup>
+            
           </div>
 
-          {/* Actions */}
           <div className="ms-3 d-flex align-items-center" style={{ gap: 8 }}>
-            <Button
-              as={Link}
-              to="/dashboard/create"
-              variant="outline-light"
-              size="sm"
-              style={{ borderRadius: 10, padding: "6px 12px", fontWeight: 700 }}
-            >
-              Quick Upload
-            </Button>
+            {isLoggedIn ? (
+              <>
+                {user.role === "admin" ? (
+                  <>
+                    <Button
+                      as={Link}
+                      to="/admin"
+                      variant="outline-light"
+                      size="sm"
+                      style={{ borderRadius: 10, fontWeight: 700 }}
+                    >
+                      Admin
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      as={Link}
+                      to="/dashboard"
+                      variant="outline-light"
+                      size="sm"
+                      style={{ borderRadius: 10, fontWeight: 700 }}
+                    >
+                      Dashboard
+                    </Button>
+                  </>
+                )}
 
-            <Button
-              as={Link}
-              to="/login"
-              variant="light"
-              size="sm"
-              style={{ borderRadius: 10, padding: "6px 12px", fontWeight: 700 }}
-            >
-              Get started
-            </Button>
+                <Button
+                  variant="outline-danger"
+                  size="sm"
+                  onClick={handleLogout}
+                  style={{ borderRadius: 10, fontWeight: 700 }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Button
+                as={Link}
+                to="/login"
+                variant="light"
+                size="sm"
+                style={{ borderRadius: 10, fontWeight: 700 }}
+              >
+                Get started
+              </Button>
+            )}
           </div>
         </Navbar.Collapse>
       </Container>
