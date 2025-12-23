@@ -1,3 +1,4 @@
+import "react-toastify/dist/ReactToastify.css";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import Layout from "./Layout";
@@ -10,8 +11,7 @@ import Checkout from "./pages/Checkout/Checkout";
 import Success from "./pages/Checkout/Success";
 import Admin from "./pages/Admin/Admin";
 import Creator from "./pages/Creator/Creator";
-import "react-toastify/dist/ReactToastify.css";
-import Dashboard from "./pages/Dashboard/Dashboard";
+import Dashboard from "./pages/Dashboard/Dashboard"; 
 
 const App = () => {
   return (
