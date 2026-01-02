@@ -16,7 +16,7 @@ const SiteNavbar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get("/api/auth/me");
+        const res = await api.get("/auth/me");
         setUser(res.data.user);
       } catch {
         setUser(null);
