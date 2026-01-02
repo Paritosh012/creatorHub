@@ -3,24 +3,31 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
 require("dotenv").config();
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: false,       // MUST be false on localhost
+  sameSite: "lax",     // MUST be lax on localhost
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+};
+
 const registerUser = async (req, res) => {
   try {
-    let { name, email, password, role } = req.body;
+    let { name, email, password } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ success: false, error: "Missing fields" });
     }
 
     email = email.toLowerCase().trim();
-    name = String(name).trim();
+    name = name.trim();
 
-    const existingEmail = await userModel.findOne({ email });
-
-    if (existingEmail)
+    const existingUser = await userModel.findOne({ email });
+    if (existingUser) {
       return res.status(409).json({
         success: false,
         msg: "User already exists",
       });
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -39,12 +46,7 @@ const registerUser = async (req, res) => {
 
     res
       .status(201)
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-      })
+      .cookie("token", token, COOKIE_OPTIONS)
       .json({
         success: true,
         msg: "Successfully registered",
@@ -57,16 +59,17 @@ const registerUser = async (req, res) => {
       });
   } catch (error) {
     console.error("registerUser error:", error);
-
-    return res
-      .status(500)
-      .json({ success: false, error: "Server error during registration" });
+    res.status(500).json({
+      success: false,
+      error: "Server error during registration",
+    });
   }
 };
 
 const loginUser = async (req, res) => {
   try {
     let { email, password } = req.body;
+
     if (!email || !password) {
       return res.status(400).json({ success: false, error: "Missing fields" });
     }
@@ -93,14 +96,9 @@ const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    return res
+    res
       .status(200)
-      .cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "none",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-      })
+      .cookie("token", token, COOKIE_OPTIONS)
       .json({
         success: true,
         user: {
@@ -112,21 +110,33 @@ const loginUser = async (req, res) => {
       });
   } catch (error) {
     console.error("loginUser error:", error);
-    return res
-      .status(500)
-      .json({ success: false, error: "Server error during login" });
+    res.status(500).json({
+      success: false,
+      error: "Server error during login",
+    });
   }
 };
 
 const me = async (req, res) => {
   try {
-    const user = await userModel.findById(req.user.id).select("-password");
-    if (!user)
-      return res.status(404).json({ success: false, error: "User not found" });
-    return res.status(200).json({ success: true, user });
-  } catch (err) {
-    console.error("GET /me error:", err);
-    return res.status(500).json({ success: false, error: "Server error" });
+    const user = await userModel
+      .findById(req.user.id)
+      .select("-password");
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: "User not found",
+      });
+    }
+
+    res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error("GET /me error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Server error",
+    });
   }
 };
 
@@ -138,11 +148,8 @@ const becomeCreator = async (req, res) => {
       { new: true }
     );
 
-    res.json({
-      success: true,
-      user,
-    });
-  } catch (err) {
+    res.json({ success: true, user });
+  } catch (error) {
     res.status(500).json({ success: false });
   }
 };
@@ -151,10 +158,16 @@ const logoutUser = (req, res) => {
   res
     .clearCookie("token", {
       httpOnly: true,
-      sameSite: "none",
-      secure: process.env.NODE_ENV === "production",
+      secure: false,
+      sameSite: "lax",
     })
     .json({ success: true, msg: "Logged out" });
 };
 
-module.exports = { registerUser, loginUser, me, becomeCreator, logoutUser };
+module.exports = {
+  registerUser,
+  loginUser,
+  me,
+  becomeCreator,
+  logoutUser,
+};

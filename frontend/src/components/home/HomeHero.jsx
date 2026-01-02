@@ -22,18 +22,18 @@ const HomeHero = () => {
     title: "",
     price: "",
     category: "ui-kits",
-    thumbnail: "",
-    fileUrl: "",
+    thumbnail: null, // file
+    file: null, // file
     description: "",
   });
 
   const isCreator = user?.role === "creator";
 
-  const handleCreateProduct = async () => {
+    const handleCreateProduct = async () => {
     if (
       !form.title ||
       !form.thumbnail ||
-      !form.fileUrl ||
+      !form.file ||
       !form.description.trim()
     ) {
       toast.error("All fields are required");
@@ -49,8 +49,8 @@ const HomeHero = () => {
         price: priceValue,
         isFree: priceValue === 0,
         category: form.category,
-        thumbnail: form.thumbnail,
-        fileUrl: form.fileUrl,
+        thumbnail: form.thumbnail, // placeholder (will change later)
+        fileUrl: form.file, // placeholder
         tags: [form.category],
       });
 
@@ -61,6 +61,7 @@ const HomeHero = () => {
       toast.error(err.response?.data?.msg || "Upload failed");
     }
   };
+
 
   const handleBecomeCreator = async () => {
     try {
@@ -159,7 +160,7 @@ const HomeHero = () => {
         centered
         size="sm"
       >
-        <Modal.Header closeButton>
+        <Modal.Header closeButton> 
           <Modal.Title>Become a Creator</Modal.Title>
         </Modal.Header>
 
