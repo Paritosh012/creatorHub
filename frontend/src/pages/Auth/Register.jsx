@@ -24,8 +24,10 @@ const Register = () => {
           localStorage.setItem("token", res.data.token);
           localStorage.setItem("user", JSON.stringify(res.data.user));
           toast.success("You are successfully registered");
-          navigate("/");
-          window.location.reload();
+          setTimeout(() => {
+            navigate("/");
+            window.location.reload();
+          }, 1500);
         }
       }
     } catch (err) {
