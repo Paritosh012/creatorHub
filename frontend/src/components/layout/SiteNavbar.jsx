@@ -2,6 +2,8 @@ import "../../styles/Footer.css";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import api from "../../services/api";
+import { toast } from "react-toastify";
 
 const SiteNavbar = () => {
   const navigate = useNavigate();
@@ -14,11 +16,17 @@ const SiteNavbar = () => {
     setIsLoggedIn(!!token);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    setIsLoggedIn(false);
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const res = api.get("/auth/logout");
+      if (res.data.success) {
+        toast.success("You are successfully logged out");
+      }
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setIsLoggedIn(false);
+      navigate("/login");
+    } catch (error) {}
   };
 
   return (

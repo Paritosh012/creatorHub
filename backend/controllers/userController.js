@@ -24,13 +24,11 @@ const registerUser = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const safeRole = role === "creator" ? "creator" : "user";
-
     const user = await userModel.create({
-      name: name,
-      email: email,
+      name,
+      email,
       password: hashedPassword,
-      role: safeRole,
+      role: "user",
     });
 
     const token = jwt.sign(
@@ -39,17 +37,24 @@ const registerUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    res.status(201).json({
-      success: true,
-      msg: "Successfully registered",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      token,
-    });
+    res
+      .status(201)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
+      .json({
+        success: true,
+        msg: "Successfully registered",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
   } catch (error) {
     console.error("registerUser error:", error);
 
@@ -88,16 +93,23 @@ const loginUser = async (req, res) => {
       { expiresIn: "7d" }
     );
 
-    return res.status(200).json({
-      success: true,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-      token,
-    });
+    return res
+      .status(200)
+      .cookie("token", token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "none",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        success: true,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
   } catch (error) {
     console.error("loginUser error:", error);
     return res
@@ -135,4 +147,14 @@ const becomeCreator = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser, me ,becomeCreator};
+const logoutUser = (req, res) => {
+  res
+    .clearCookie("token", {
+      httpOnly: true,
+      sameSite: "none",
+      secure: process.env.NODE_ENV === "production",
+    })
+    .json({ success: true, msg: "Logged out" });
+};
+
+module.exports = { registerUser, loginUser, me, becomeCreator, logoutUser };

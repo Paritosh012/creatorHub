@@ -14,24 +14,25 @@ const Register = () => {
     e.preventDefault();
 
     try {
-      if (name && email && password) {
-        let res = await api.post("/auth/register", {
-          name,
-          email,
-          password,
-        });
-        if (res.data.success) {
-          localStorage.setItem("token", res.data.token);
-          localStorage.setItem("user", JSON.stringify(res.data.user));
-          toast.success("You are successfully registered");
-          setTimeout(() => {
-            navigate("/");
-            window.location.reload();
-          }, 1500);
-        }
+      if (!name || !email || !password) {
+        toast.error("All fields are required");
+        return;
+      }
+
+      const res = await api.post("/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      if (res.data.success) { 
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+
+        toast.success("You are successfully registered");
+        navigate("/");
       }
     } catch (err) {
-      alert(err.response?.data?.msg || "Registration failed");
+      toast.error(err.response?.data?.msg || "Registration failed");
     }
   };
 
