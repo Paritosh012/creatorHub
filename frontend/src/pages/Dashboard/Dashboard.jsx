@@ -25,7 +25,7 @@ const Dashboard = () => {
   const [form, setForm] = useState({
     title: "",
     price: "",
-    category: "ui-kits",
+    category: "ui-kits", 
     thumbnail: "",
     fileUrl: "",
     description: "",

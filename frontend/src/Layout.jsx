@@ -6,7 +6,7 @@ import { ToastContainer } from "react-toastify";
 const Layout = () => {
   return (
     <>
-      {" "}
+      
       <ToastContainer
         position="top-center"
         autoClose={1500}
