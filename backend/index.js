@@ -24,7 +24,7 @@ if (!process.env.DBCONNECTIONSTRING) {
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://creator-hub-82iz.vercel.app"],
+    origin: ["https://creator-hub-82iz.vercel.app"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
