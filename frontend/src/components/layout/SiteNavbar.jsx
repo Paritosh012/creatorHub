@@ -1,5 +1,5 @@
 import "../../styles/Footer.css";
-import { Navbar, Nav, Container, Button } from "react-bootstrap";
+import { Navbar, Nav, Container, Button, Spinner } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
@@ -7,27 +7,47 @@ import { toast } from "react-toastify";
 
 const SiteNavbar = () => {
   const navigate = useNavigate();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
-  const user = localStorage.getItem("user");
 
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const checkAuth = async () => {
+      try {
+        const res = await api.get("/auth/me");
+        setUser(res.data.user);
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, [location.pathname]);
 
+  /* ---------------- LOGOUT ---------------- */
   const handleLogout = async () => {
     try {
-      const res = api.get("/auth/logout");
-      if (res.data.success) {
-        toast.success("You are successfully logged out");
-      }
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
-      setIsLoggedIn(false);
+      await api.post("/auth/logout");
+      setUser(null);
+      toast.success("Logged out successfully");
       navigate("/login");
-    } catch (error) {}
+    } catch {
+      toast.error("Logout failed");
+    }
   };
+
+  /* ---------------- LOADING STATE ---------------- */
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center py-2">
+        <Spinner size="sm" />
+      </div>
+    );
+  }
 
   return (
     <Navbar
@@ -42,6 +62,7 @@ const SiteNavbar = () => {
       }}
     >
       <Container fluid="lg">
+        {/* BRAND */}
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
           <div
             style={{
@@ -69,50 +90,43 @@ const SiteNavbar = () => {
 
         <Navbar.Toggle />
         <Navbar.Collapse>
+          {/* LEFT LINKS */}
           <Nav className="me-auto align-items-lg-center" style={{ gap: 12 }}>
             <Nav.Link as={Link} to="/explore">
               Explore
             </Nav.Link>
 
-            {isLoggedIn && (
+            {user && (
               <Nav.Link as={Link} to="/dashboard">
                 Creator
               </Nav.Link>
             )}
           </Nav>
 
-          <div
-            className="d-none d-lg-flex align-items-center"
-            style={{ gap: 10, marginLeft: 10 }}
-          ></div>
-
+          {/* RIGHT ACTIONS */}
           <div className="ms-3 d-flex align-items-center" style={{ gap: 8 }}>
-            {isLoggedIn ? (
+            {user ? (
               <>
                 {user.role === "admin" ? (
-                  <>
-                    <Button
-                      as={Link}
-                      to="/admin"
-                      variant="outline-light"
-                      size="sm"
-                      style={{ borderRadius: 10, fontWeight: 700 }}
-                    >
-                      Admin
-                    </Button>
-                  </>
+                  <Button
+                    as={Link}
+                    to="/admin"
+                    variant="outline-light"
+                    size="sm"
+                    style={{ borderRadius: 10, fontWeight: 700 }}
+                  >
+                    Admin
+                  </Button>
                 ) : (
-                  <>
-                    <Button
-                      as={Link}
-                      to="/dashboard"
-                      variant="outline-light"
-                      size="sm"
-                      style={{ borderRadius: 10, fontWeight: 700 }}
-                    >
-                      Dashboard
-                    </Button>
-                  </>
+                  <Button
+                    as={Link}
+                    to="/dashboard"
+                    variant="outline-light"
+                    size="sm"
+                    style={{ borderRadius: 10, fontWeight: 700 }}
+                  >
+                    Dashboard
+                  </Button>
                 )}
 
                 <Button
