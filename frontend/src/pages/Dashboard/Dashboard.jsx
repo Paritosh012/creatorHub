@@ -26,8 +26,8 @@ const Dashboard = () => {
     title: "",
     price: "",
     category: "ui-kits",
-    thumbnail: "",
-    fileUrl: "",
+    thumbnail: null, // File
+    file: null, // File
     description: "",
   });
 
@@ -91,8 +91,8 @@ const Dashboard = () => {
       title: product.title,
       price: product.price,
       category: product.category,
-      thumbnail: product.thumbnail,
-      fileUrl: product.fileUrl,
+      thumbnail: null,
+      file: null,
       description: product.description,
     });
     setShowModal(true);
@@ -202,10 +202,7 @@ const Dashboard = () => {
       {/* ACTIONS */}
       <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
         <Button onClick={() => setShowModal(true)}>Add New Product</Button>
-        <Button
-          variant="outline-light"
-          onClick={() => navigate("/explore")}
-        >
+        <Button variant="outline-light" onClick={() => navigate("/explore")}>
           Explore Marketplace
         </Button>
       </div>
@@ -293,21 +290,26 @@ const Dashboard = () => {
               <option value="3d-assets">3D Assets</option>
             </Form.Select>
 
-            <Form.Control
-              className="mb-2"
-              placeholder="Thumbnail URL"
-              value={form.thumbnail}
-              onChange={(e) =>
-                setForm({ ...form, thumbnail: e.target.value })
-              }
-            />
+            {/* Thumbnail upload */}
+            <Form.Group className="mb-2">
+              <Form.Label>Thumbnail Image</Form.Label>
+              <Form.Control
+                type="file"
+                accept="image/*"
+                onChange={(e) =>
+                  setForm({ ...form, thumbnail: e.target.files[0] })
+                }
+              />
+            </Form.Group>
 
-            <Form.Control
-              className="mb-2"
-              placeholder="Download file URL"
-              value={form.fileUrl}
-              onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
-            />
+            {/* Product file upload */}
+            <Form.Group className="mb-2">
+              <Form.Label>Product File</Form.Label>
+              <Form.Control
+                type="file"
+                onChange={(e) => setForm({ ...form, file: e.target.files[0] })}
+              />
+            </Form.Group>
 
             <Form.Control
               as="textarea"
