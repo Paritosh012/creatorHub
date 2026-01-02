@@ -1,5 +1,6 @@
 const Product = require("../models/productModel");
 const generateUniqueSlug = require("../utils/slug");
+const uploadToCloudinary = require("../utils/uploadToCloudinary");
 
 const getAllProducts = async (req, res) => {
   try {
@@ -30,52 +31,48 @@ const getProductBySlug = async (req, res) => {
   }
 };
 
+
 const createProduct = async (req, res) => {
   try {
-    if (req.user.role !== "creator") {
-      return res.status(403).json({ success: false, msg: "Not a creator" });
+    const { title, description, price, category, isFree, tags } = req.body;
+
+    if (!req.files?.thumbnail || !req.files?.file) {
+      return res.status(400).json({ msg: "Files are required" });
     }
 
-    const {
+    // Upload thumbnail
+    const thumbnailUpload = await uploadToCloudinary(
+      req.files.thumbnail[0].buffer,
+      "creatorhub/thumbnails",
+      "image"
+    );
+
+    // Upload product file
+    const fileUpload = await uploadToCloudinary(
+      req.files.file[0].buffer,
+      "creatorhub/products",
+      "raw"
+    );
+
+    const product = await Product.create({
       title,
       description,
       price,
       isFree,
       category,
       tags,
-      thumbnail,
-      fileUrl,
-      previewImages,
-      licenseType,
-    } = req.body;
-
-    if (!title || !description || !category || !thumbnail || !fileUrl) {
-      return res.status(400).json({ success: false, msg: "Missing fields" });
-    }
-
-    const slug = await generateUniqueSlug(title);
-
-    const product = await Product.create({
-      title,
-      slug,
-      description,
-      price: isFree ? 0 : price,
-      isFree,
-      category,
-      tags,
-      thumbnail,
-      previewImages,
-      fileUrl,
-      licenseType,
+      thumbnail: thumbnailUpload.secure_url,
+      fileUrl: fileUpload.secure_url,
       creator: req.user.id,
-      status: "published",
-      isPopular: false,
     });
 
-    res.status(201).json({ success: true, product });
+    res.status(201).json({
+      success: true,
+      product,
+    });
   } catch (err) {
-    console.error("CREATE PRODUCT ERROR:", err);
-    res.status(400).json({ success: false, msg: err.message });
+    console.error("Create product error:", err);
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
