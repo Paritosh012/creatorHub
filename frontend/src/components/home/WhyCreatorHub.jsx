@@ -3,8 +3,7 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 
 /**
  * WhyCreatorHub.jsx
- * Premium 3–4 feature cards explaining CreatorHub's value.
- * Matches the site's dark-glass tone and spacing rhythm.
+ * UI-only polish for mobile responsiveness and touch UX.
  */
 
 const features = [
@@ -36,48 +35,57 @@ const features = [
 
 const WhyCreatorHub = () => {
   return (
-    <section style={{ paddingTop: 56, paddingBottom: 56 }}>
+    <section className="py-4 py-md-5">
       <Container>
-        <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: 10 }}>
+        <h2
+          style={{
+            color: "#fff",
+            fontWeight: 800,
+            marginBottom: 8,
+          }}
+        >
           Why CreatorHub?
         </h2>
 
-        <p style={{ color: "#9ca3af", marginBottom: 32, fontSize: 14 }}>
+        <p
+          style={{
+            color: "#9ca3af",
+            marginBottom: 28,
+            fontSize: 14,
+            maxWidth: 520,
+          }}
+        >
           A platform designed for creators and loved by teams.
         </p>
 
-        <Row className="g-4">
+        <Row className="g-3 g-md-4">
           {features.map((f) => (
             <Col key={f.id} xs={12} sm={6} lg={3}>
               <Card
+                className="h-100"
                 style={{
                   background:
-                    "linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.006))",
+                    "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006))",
                   border: "1px solid rgba(255,255,255,0.06)",
                   borderRadius: 14,
-                  padding: 20,
-                  height: "100%",
-                  transition: "0.2s ease",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.border =
-                    "1px solid rgba(255,255,255,0.12)";
-                  e.currentTarget.style.transform = "translateY(-3px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.border =
-                    "1px solid rgba(255,255,255,0.06)";
-                  e.currentTarget.style.transform = "translateY(0px)";
+                  padding: 18,
                 }}
               >
-                <div style={{ fontSize: 36 }}>{f.icon}</div>
+                <div
+                  style={{
+                    fontSize: 32,
+                    marginBottom: 10,
+                  }}
+                >
+                  {f.icon}
+                </div>
 
                 <h5
                   style={{
-                    marginTop: 14,
                     marginBottom: 6,
                     color: "#fff",
                     fontWeight: 700,
+                    fontSize: 16,
                   }}
                 >
                   {f.title}
@@ -88,7 +96,7 @@ const WhyCreatorHub = () => {
                     color: "#9ca3af",
                     fontSize: 13,
                     marginBottom: 0,
-                    lineHeight: 1.4,
+                    lineHeight: 1.45,
                   }}
                 >
                   {f.desc}

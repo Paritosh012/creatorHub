@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-
 import { Card, Badge } from "react-bootstrap";
 
 const ProductCard = ({ product }) => {
@@ -12,6 +11,10 @@ const ProductCard = ({ product }) => {
 
   return (
     <Card
+      role="button"
+      aria-label={`Open product ${product.title}`}
+      onClick={() => navigate(`/product/${product.slug}`)}
+      className="h-100"
       style={{
         background:
           "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))",
@@ -19,92 +22,61 @@ const ProductCard = ({ product }) => {
         borderRadius: 14,
         overflow: "hidden",
         cursor: "pointer",
-        transition: "0.25s ease",
-        position: "relative",
+        transition: "transform 0.15s ease, border-color 0.15s ease",
       }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = "translateY(-4px)";
-        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = "translateY(0)";
-        e.currentTarget.style.border = "1px solid rgba(255,255,255,0.05)";
-      }}
-      onClick={() => navigate(`/product/${product.slug}`)}
     >
-      {/* Thumbnail + overlay */}
-      <div style={{ width: "100%", height: 170, position: "relative" }}>
+      {/* Thumbnail */}
+      <div
+        style={{
+          position: "relative",
+          paddingTop: "62%",
+          background: "rgba(255,255,255,0.02)",
+        }}
+      >
         <img
           src={product.thumbnail}
           alt={product.title}
           loading="lazy"
           style={{
+            position: "absolute",
+            inset: 0,
             width: "100%",
             height: "100%",
             objectFit: "cover",
           }}
         />
 
-        {/* NEW / FREE Badge */}
+        {/* Badge */}
         {(isFree || isNew) && (
           <Badge
-            bg="info"
+            bg=""
             style={{
               position: "absolute",
               top: 10,
               left: 10,
-              backdropFilter: "blur(4px)",
               background: "rgba(6,182,212,0.16)",
               color: "#06b6d4",
               borderRadius: 8,
               fontSize: 12,
               padding: "4px 8px",
               fontWeight: 600,
+              backdropFilter: "blur(4px)",
             }}
           >
             {isFree ? "Free" : "New"}
           </Badge>
         )}
-
-        {/* Hover overlay */}
-        <div
-          className="hover-overlay"
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(0,0,0,0.4)",
-            opacity: 0,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "#e6eef2",
-            fontSize: 14,
-            fontWeight: 500,
-            transition: "0.25s ease",
-          }}
-        >
-          View details →
-        </div>
       </div>
 
-      {/* Show overlay on hover */}
-      <style>
-        {`
-        .hover-overlay:hover {
-          opacity: 1 !important;
-        }
-      `}
-      </style>
-
-      {/* Card Body */}
-      <Card.Body style={{ padding: 14 }}>
+      {/* Body */}
+      <Card.Body style={{ padding: "14px 14px 16px" }}>
         <h6
           style={{
             color: "#fff",
             fontWeight: 700,
             marginBottom: 6,
             fontSize: 15,
-            lineHeight: "1.2",
+            lineHeight: 1.2,
           }}
         >
           {product.title}
@@ -134,7 +106,7 @@ const ProductCard = ({ product }) => {
               <span
                 key={i}
                 style={{
-                  background: "rgba(255,255,255,0.03)",
+                  background: "rgba(255,255,255,0.04)",
                   borderRadius: 6,
                   padding: "2px 8px",
                   color: "#9ca3af",
@@ -147,7 +119,7 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* Price + Downloads */}
+        {/* Price + downloads */}
         <div
           style={{
             display: "flex",
@@ -158,7 +130,7 @@ const ProductCard = ({ product }) => {
           <div
             style={{
               color: isFree ? "#06b6d4" : "#e6eef2",
-              fontWeight: 600,
+              fontWeight: 700,
               fontSize: 14,
             }}
           >

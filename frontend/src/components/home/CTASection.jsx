@@ -2,43 +2,29 @@ import React from "react";
 import { Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-/**
- * CTASection.jsx
- * Final call-to-action section with premium dark-glass style.
- * No logic — purely presentational.
- */
-
 const CTASection = () => {
   return (
-    <section
-      style={{
-        paddingTop: 56,
-        paddingBottom: 56,
-      }}
-    >
+    <section className="py-4 py-md-5">
       <Container
         style={{
           background:
-            "linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.006))",
+            "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006))",
           border: "1px solid rgba(255,255,255,0.06)",
           borderRadius: 16,
-          padding: "40px 32px",
+          padding: "28px 20px",
           textAlign: "center",
-          transition: "0.2s ease",
+          transition: "border-color 0.2s ease",
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.border = "1px solid rgba(255,255,255,0.12)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.border = "1px solid rgba(255,255,255,0.06)";
-        }}
+        className="px-sm-4 py-sm-4 px-md-5 py-md-4"
       >
         <h2
           style={{
             color: "#fff",
             fontWeight: 800,
             marginBottom: 10,
+            fontSize: 22,
           }}
+          className="fs-md-2"
         >
           Join CreatorHub today
         </h2>
@@ -46,31 +32,25 @@ const CTASection = () => {
         <p
           style={{
             color: "#9ca3af",
-            fontSize: 15,
-            marginBottom: 26,
-            maxWidth: 480,
+            fontSize: 14,
+            marginBottom: 22,
+            maxWidth: 520,
             marginInline: "auto",
+            lineHeight: 1.5,
           }}
         >
           Discover premium assets or start selling your own creations to a
           global audience — all in one place.
         </p>
 
-        <div
-          style={{
-            display: "flex",
-            gap: 14,
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
+        <div className="d-flex flex-column flex-sm-row gap-3 justify-content-center">
           <Button
             as={Link}
             to="/explore"
             variant="light"
+            className="fw-semibold"
             style={{
               padding: "10px 22px",
-              fontWeight: 700,
               borderRadius: 12,
               color: "#0b0f19",
             }}
@@ -82,11 +62,11 @@ const CTASection = () => {
             as={Link}
             to="/become-a-creator"
             variant="outline-light"
+            className="fw-semibold"
             style={{
               padding: "10px 22px",
-              fontWeight: 700,
               borderRadius: 12,
-              borderColor: "rgba(255,255,255,0.20)",
+              borderColor: "rgba(255,255,255,0.25)",
             }}
           >
             Become a Creator

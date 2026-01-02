@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "react-bootstrap";
+import { Button, Card, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 const Success = () => {
@@ -11,53 +11,65 @@ const Success = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        minHeight: "70vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-      }}
-    >
-      <div
+    <Container className="d-flex justify-content-center align-items-center py-5">
+      <Card
         style={{
+          maxWidth: 420,
+          width: "100%",
+          background: "rgba(255,255,255,0.04)",
+          border: "1px solid rgba(255,255,255,0.08)",
+          borderRadius: 18,
           textAlign: "center",
-          transform: show ? "scale(1)" : "scale(0.9)",
+          transform: show ? "scale(1)" : "scale(0.94)",
           opacity: show ? 1 : 0,
           transition: "0.4s ease",
         }}
       >
-        <div
-          style={{
-            fontSize: 60,
-            marginBottom: 10,
-          }}
-        >
-          ✅
-        </div>
+        <Card.Body style={{ padding: "32px 26px" }}>
+          <div
+            style={{
+              fontSize: 56,
+              marginBottom: 12,
+            }}
+          >
+            ✅
+          </div>
 
-        <h2 style={{ color: "#fff", fontWeight: 800 }}>
-          Payment Successful
-        </h2>
+          <h2
+            style={{
+              color: "#fff",
+              fontWeight: 800,
+              marginBottom: 8,
+            }}
+          >
+            Payment Successful
+          </h2>
 
-        <p style={{ color: "#9ca3af", marginTop: 10 }}>
-          Thank you for your purchase.  
-          Your asset is ready.
-        </p>
+          <p
+            style={{
+              color: "#9ca3af",
+              fontSize: 15,
+              lineHeight: 1.5,
+              marginBottom: 24,
+            }}
+          >
+            Thank you for your purchase.  
+            Your asset is ready to use.
+          </p>
 
-        <Button
-          style={{
-            marginTop: 25,
-            padding: "10px 24px",
-            fontWeight: 600,
-            borderRadius: 10,
-          }}
-          onClick={() => navigate("/explore")}
-        >
-          Back to Explore
-        </Button>
-      </div>
-    </div>
+          <Button
+            style={{
+              padding: "10px 24px",
+              fontWeight: 600,
+              borderRadius: 10,
+            }}
+            onClick={() => navigate("/explore")}
+          >
+            Back to Explore
+          </Button>
+        </Card.Body>
+      </Card>
+    </Container>
   );
 };
 

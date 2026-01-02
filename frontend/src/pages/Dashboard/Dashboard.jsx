@@ -25,7 +25,7 @@ const Dashboard = () => {
   const [form, setForm] = useState({
     title: "",
     price: "",
-    category: "ui-kits", 
+    category: "ui-kits",
     thumbnail: "",
     fileUrl: "",
     description: "",
@@ -156,7 +156,7 @@ const Dashboard = () => {
   /* ---------------- LOADING ---------------- */
   if (loading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
+      <div className="d-flex justify-content-center py-5">
         <Spinner />
       </div>
     );
@@ -164,54 +164,64 @@ const Dashboard = () => {
 
   /* ---------------- UI ---------------- */
   return (
-    <Container style={{ paddingTop: 40 }}>
+    <Container className="py-4 py-md-5">
+      {/* HEADER */}
       <h2 style={{ color: "#fff", fontWeight: 800 }}>
         Welcome, {user?.name || "Creator"}
       </h2>
       <p style={{ color: "#9ca3af" }}>Manage your products</p>
 
       {/* STATS */}
-      <Row className="g-4 mt-3">
-        <Col md={4}>
-          <Card className="p-3 bg-dark border-secondary">
-            <h6>Total Products</h6>
-            <h3>{products.length}</h3>
+      <Row className="g-3 mt-3">
+        <Col xs={12} md={4}>
+          <Card className="p-3 bg-dark border-secondary h-100">
+            <div style={{ color: "#9ca3af", fontSize: 13 }}>Total Products</div>
+            <h3 style={{ marginTop: 4 }}>{products.length}</h3>
           </Card>
         </Col>
-        <Col md={4}>
-          <Card className="p-3 bg-dark border-secondary">
-            <h6>Total Downloads</h6>
-            <h3>{products.reduce((s, p) => s + (p.downloads || 0), 0)}</h3>
+
+        <Col xs={12} md={4}>
+          <Card className="p-3 bg-dark border-secondary h-100">
+            <div style={{ color: "#9ca3af", fontSize: 13 }}>
+              Total Downloads
+            </div>
+            <h3 style={{ marginTop: 4 }}>
+              {products.reduce((s, p) => s + (p.downloads || 0), 0)}
+            </h3>
           </Card>
         </Col>
-        <Col md={4}>
-          <Card className="p-3 bg-dark border-secondary">
-            <h6>Status</h6>
-            <h3>Creator</h3>
+
+        <Col xs={12} md={4}>
+          <Card className="p-3 bg-dark border-secondary h-100">
+            <div style={{ color: "#9ca3af", fontSize: 13 }}>Status</div>
+            <h3 style={{ marginTop: 4 }}>Creator</h3>
           </Card>
         </Col>
       </Row>
 
       {/* ACTIONS */}
-      <div className="d-flex gap-2 mt-4">
+      <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
         <Button onClick={() => setShowModal(true)}>Add New Product</Button>
-        <Button variant="outline-light" onClick={() => navigate("/explore")}>
+        <Button
+          variant="outline-light"
+          onClick={() => navigate("/explore")}
+        >
           Explore Marketplace
         </Button>
       </div>
 
       {/* PRODUCTS */}
-      <h4 className="mt-5">Your Products</h4>
+      <h4 style={{ marginTop: 40 }}>Your Products</h4>
 
       {products.length === 0 ? (
         <p style={{ color: "#9ca3af" }}>
           You haven’t created any products yet.
         </p>
       ) : (
-        <Row className="g-4 mt-2">
+        <Row className="g-3 mt-2">
           {products.map((p) => (
-            <Col md={4} key={p._id}>
-              <Card className="bg-dark border-secondary">
+            <Col xs={12} sm={6} md={4} key={p._id}>
+              <Card className="bg-dark border-secondary h-100">
                 <Card.Img
                   variant="top"
                   src={p.thumbnail}
@@ -248,7 +258,7 @@ const Dashboard = () => {
       )}
 
       {/* MODAL */}
-      <Modal show={showModal} onHide={closeModal} centered>
+      <Modal show={showModal} onHide={closeModal} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>
             {editingId ? "Edit Product" : "Upload New Product"}
@@ -287,7 +297,9 @@ const Dashboard = () => {
               className="mb-2"
               placeholder="Thumbnail URL"
               value={form.thumbnail}
-              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, thumbnail: e.target.value })
+              }
             />
 
             <Form.Control

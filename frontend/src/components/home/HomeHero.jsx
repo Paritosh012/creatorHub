@@ -55,7 +55,6 @@ const HomeHero = () => {
       });
 
       toast.success("Product uploaded 🚀");
-
       setShowProductModal(false);
       navigate("/dashboard");
     } catch (err) {
@@ -80,19 +79,34 @@ const HomeHero = () => {
 
   return (
     <>
-      <section style={{ padding: 64 }}>
+      {/* HERO */}
+      <section className="py-4 py-md-5">
         <Container>
-          <Row className="align-items-center">
+          <Row className="align-items-center gy-4">
+            {/* TEXT */}
             <Col lg={6}>
-              <h1 style={{ color: "#fff", fontWeight: 800 }}>
+              <h1
+                style={{
+                  color: "#fff",
+                  fontWeight: 800,
+                  fontSize: "clamp(28px, 4vw, 42px)",
+                }}
+              >
                 A Premium Marketplace for Creators
               </h1>
 
-              <p style={{ color: "#9ca3af", marginTop: 16 }}>
+              <p
+                style={{
+                  color: "#9ca3af",
+                  marginTop: 14,
+                  fontSize: 15,
+                  maxWidth: 520,
+                }}
+              >
                 Sell UI kits, templates, icons, and digital assets.
               </p>
 
-              <div style={{ display: "flex", gap: 12, marginTop: 26 }}>
+              <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
                 <Button as={Link} to="/explore">
                   Explore Assets
                 </Button>
@@ -121,11 +135,17 @@ const HomeHero = () => {
               </div>
             </Col>
 
+            {/* IMAGE */}
             <Col lg={6}>
               <img
                 src="https://picsum.photos/seed/creatorhub/900/560"
                 alt="preview"
-                style={{ width: "100%", borderRadius: 12 }}
+                style={{
+                  width: "100%",
+                  borderRadius: 14,
+                  maxHeight: 420,
+                  objectFit: "cover",
+                }}
               />
             </Col>
           </Row>
@@ -133,7 +153,12 @@ const HomeHero = () => {
       </section>
 
       {/* BECOME CREATOR MODAL */}
-      <Modal show={showCreatorModal} onHide={() => setShowCreatorModal(false)} centered>
+      <Modal
+        show={showCreatorModal}
+        onHide={() => setShowCreatorModal(false)}
+        centered
+        size="sm"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Become a Creator</Modal.Title>
         </Modal.Header>
@@ -143,7 +168,10 @@ const HomeHero = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreatorModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowCreatorModal(false)}
+          >
             Cancel
           </Button>
           <Button onClick={handleBecomeCreator}>Confirm</Button>
@@ -151,7 +179,12 @@ const HomeHero = () => {
       </Modal>
 
       {/* PRODUCT UPLOAD MODAL */}
-      <Modal show={showProductModal} onHide={() => setShowProductModal(false)} centered>
+      <Modal
+        show={showProductModal}
+        onHide={() => setShowProductModal(false)}
+        centered
+        size="lg"
+      >
         <Modal.Header closeButton>
           <Modal.Title>Upload New Product</Modal.Title>
         </Modal.Header>
@@ -177,7 +210,9 @@ const HomeHero = () => {
               className="mb-2"
               placeholder="Thumbnail URL"
               value={form.thumbnail}
-              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, thumbnail: e.target.value })
+              }
             />
 
             <Form.Control
@@ -200,7 +235,10 @@ const HomeHero = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowProductModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowProductModal(false)}
+          >
             Cancel
           </Button>
           <Button onClick={handleCreateProduct}>Upload</Button>

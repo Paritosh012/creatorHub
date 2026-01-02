@@ -34,14 +34,14 @@ const productsList = [
   },
 ];
 
-  const PopularProducts = () => {
+const PopularProducts = () => {
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         let res = await getPopularProducts();
-        setProducts(response.data.products);
+        setProducts(res.data.products);
       } catch {
         setProducts(productsList);
       }
@@ -52,25 +52,32 @@ const productsList = [
   return (
     <section
       aria-label="Popular assets"
-      style={{
-        paddingTop: 56,
-        paddingBottom: 56,
-        background: "transparent",
-      }}
+      className="py-4 py-md-5"
     >
       <Container>
-        <Row className="align-items-center mb-3">
+        {/* Header */}
+        <Row className="align-items-start align-items-md-center mb-3">
           <Col>
-            <h2 style={{ color: "#fff", fontWeight: 800 }}>
+            <h2 style={{ color: "#fff", fontWeight: 800, marginBottom: 6 }}>
               Trending This Week
             </h2>
             <p
-              style={{ color: "var(--muted)", marginBottom: 24, fontSize: 14 }}
+              style={{
+                color: "var(--muted)",
+                fontSize: 14,
+                marginBottom: 0,
+                maxWidth: 520,
+              }}
             >
               Hand-picked digital assets trending on CreatorHub.
             </p>
           </Col>
-          <Col xs="auto">
+
+          <Col
+            xs={12}
+            md="auto"
+            className="mt-2 mt-md-0"
+          >
             <Link
               to="/explore"
               style={{
@@ -88,9 +95,9 @@ const productsList = [
         {!products || products.length === 0 ? (
           <EmptyState />
         ) : (
-          <Row className="g-4">
+          <Row className="g-3 g-md-4">
             {products.map((p) => (
-              <Col key={p.id} xs={12} sm={6} md={4} lg={3}>
+              <Col key={p.id} xs={12} sm={6} lg={3}>
                 <ProductCard product={p} />
               </Col>
             ))}
@@ -109,58 +116,51 @@ const ProductCard = ({ product }) => {
       as={Link}
       to={`/product/${id}`}
       aria-label={`Open product ${title}`}
-      className="h-100 card-glass"
+      className="h-100 card-glass text-decoration-none"
       style={{
         overflow: "hidden",
-        color: "inherit",
-        textDecoration: "none",
-        transition: "transform 0.2s ease, border-color 0.2s ease",
+        transition: "transform 0.15s ease, border-color 0.15s ease",
       }}
     >
-      {/* image wrapper (preserves ratio, rounded corners handled by overflow) */}
+      {/* Image */}
       <div
         style={{
           position: "relative",
-          paddingTop: "60%",
-          background: "rgba(255,255,255,0.01)",
+          paddingTop: "62%",
+          background: "rgba(255,255,255,0.02)",
         }}
       >
         <img
           src={thumbnail || `https://picsum.photos/seed/p-${id}/800/560`}
           alt={title}
+          loading="lazy"
           style={{
             position: "absolute",
             inset: 0,
             width: "100%",
             height: "100%",
             objectFit: "cover",
-            display: "block",
           }}
-          loading="lazy"
         />
       </div>
 
-      <Card.Body style={{ padding: "12px 14px" }}>
+      <Card.Body style={{ padding: "14px 14px 16px" }}>
         <Card.Title
           style={{
             color: "#fff",
             fontSize: 15,
             fontWeight: 700,
             marginBottom: 6,
-            lineHeight: 1.15,
+            lineHeight: 1.2,
           }}
         >
           {title}
         </Card.Title>
 
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>{creator}</div>
+        <div className="d-flex justify-content-between align-items-center">
+          <div style={{ color: "var(--muted)", fontSize: 13 }}>
+            {creator}
+          </div>
           <div style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>
             {price === 0 ? "Free" : `₹${price}`}
           </div>
@@ -175,16 +175,21 @@ const EmptyState = () => (
     role="status"
     style={{
       borderRadius: 12,
-      padding: 28,
+      padding: 24,
       background:
-        "linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005))",
+        "linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.005))",
       border: "1px solid rgba(255,255,255,0.04)",
       color: "var(--muted)",
       textAlign: "center",
     }}
   >
     <div
-      style={{ fontSize: 18, fontWeight: 700, color: "#fff", marginBottom: 6 }}
+      style={{
+        fontSize: 17,
+        fontWeight: 700,
+        color: "#fff",
+        marginBottom: 6,
+      }}
     >
       No products found
     </div>

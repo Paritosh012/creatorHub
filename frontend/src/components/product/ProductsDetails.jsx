@@ -23,7 +23,7 @@ const ProductDetails = () => {
 
   if (loading)
     return (
-      <div className="d-flex justify-content-center mt-5">
+      <div className="d-flex justify-content-center py-5">
         <Spinner animation="border" variant="light" />
       </div>
     );
@@ -38,9 +38,9 @@ const ProductDetails = () => {
   const isFree = product.price === 0;
 
   return (
-    <Container style={{ paddingTop: 50, paddingBottom: 50 }}>
-      <Row className="g-5">
-        {/* LEFT: Preview */}
+    <Container className="py-4 py-md-5">
+      <Row className="g-4 g-md-5">
+        {/* PREVIEW */}
         <Col md={7}>
           <div
             style={{
@@ -49,19 +49,29 @@ const ProductDetails = () => {
               border: "1px solid rgba(255,255,255,0.06)",
             }}
           >
-            <img
-              src={product.thumbnail}
-              alt={product.title}
+            <div
               style={{
-                width: "100%",
-                height: 380,
-                objectFit: "cover",
+                position: "relative",
+                paddingTop: "56%",
+                background: "rgba(255,255,255,0.02)",
               }}
-            />
+            >
+              <img
+                src={product.thumbnail}
+                alt={product.title}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                }}
+              />
+            </div>
           </div>
 
           {product.previewImages?.length > 0 && (
-            <div className="d-flex gap-2 mt-3">
+            <div className="d-flex gap-2 mt-3 flex-wrap">
               {product.previewImages.slice(0, 3).map((img, i) => (
                 <img
                   key={i}
@@ -80,10 +90,10 @@ const ProductDetails = () => {
           )}
         </Col>
 
-        {/* RIGHT: Info */}
+        {/* INFO */}
         <Col md={5}>
           <Badge
-            bg="secondary"
+            bg=""
             style={{
               background: "rgba(255,255,255,0.08)",
               color: "#9ca3af",
@@ -94,7 +104,14 @@ const ProductDetails = () => {
             {product.category}
           </Badge>
 
-          <h1 style={{ color: "#fff", fontWeight: 800, marginTop: 10 }}>
+          <h1
+            style={{
+              color: "#fff",
+              fontWeight: 800,
+              marginTop: 10,
+              fontSize: "clamp(26px, 4vw, 36px)",
+            }}
+          >
             {product.title}
           </h1>
 
@@ -104,16 +121,17 @@ const ProductDetails = () => {
               fontSize: 15,
               lineHeight: 1.6,
               marginTop: 14,
+              maxWidth: 520,
             }}
           >
             {product.description}
           </p>
 
-          {/* Price */}
-          <div style={{ marginTop: 24 }}>
+          {/* PRICE */}
+          <div style={{ marginTop: 22 }}>
             <span
               style={{
-                fontSize: 26,
+                fontSize: 24,
                 fontWeight: 800,
                 color: isFree ? "#06b6d4" : "#e6eef2",
               }}
@@ -122,14 +140,14 @@ const ProductDetails = () => {
             </span>
 
             {!isFree && (
-              <span style={{ color: "#9ca3af", marginLeft: 10 }}>
+              <span style={{ color: "#9ca3af", marginLeft: 8 }}>
                 one-time purchase
               </span>
             )}
           </div>
 
           {/* CTA */}
-          <div className="d-flex gap-3 mt-4">
+          <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
             <Button
               size="lg"
               style={{
@@ -156,11 +174,11 @@ const ProductDetails = () => {
             </Button>
           </div>
 
-          {/* Meta */}
+          {/* META */}
           <div
             style={{
-              marginTop: 30,
-              paddingTop: 20,
+              marginTop: 28,
+              paddingTop: 18,
               borderTop: "1px solid rgba(255,255,255,0.08)",
               color: "#9ca3af",
               fontSize: 14,

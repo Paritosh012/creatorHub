@@ -1,5 +1,5 @@
 import "../../styles/Footer.css";
-import { Navbar, Nav, Container, Button, Spinner } from "react-bootstrap";
+import { Navbar, Nav, Container, Button } from "react-bootstrap";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 const SiteNavbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-
   const [user, setUser] = useState(null);
 
   /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
@@ -38,13 +37,12 @@ const SiteNavbar = () => {
     }
   };
 
-  /* ---------------- LOADING STATE ---------------- */
-
   return (
     <Navbar
       expand="lg"
       variant="dark"
       sticky="top"
+      className="py-2"
       style={{
         background:
           "linear-gradient(180deg, rgba(11,15,25,0.75), rgba(7,9,14,0.9))",
@@ -53,11 +51,16 @@ const SiteNavbar = () => {
       }}
     >
       <Container fluid="lg">
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
+        {/* BRAND */}
+        <Navbar.Brand
+          as={Link}
+          to="/"
+          className="d-flex align-items-center gap-2"
+        >
           <div
             style={{
-              height: 40,
-              width: 40,
+              height: 38,
+              width: 38,
               borderRadius: 10,
               background: "linear-gradient(135deg,#7c3aed,#06b6d4)",
               display: "flex",
@@ -65,12 +68,13 @@ const SiteNavbar = () => {
               justifyContent: "center",
               color: "white",
               fontWeight: 800,
-              marginRight: 10,
+              fontSize: 14,
             }}
           >
             CH
           </div>
-          <div style={{ lineHeight: 1 }}>
+
+          <div className="d-none d-sm-block" style={{ lineHeight: 1 }}>
             <div style={{ fontWeight: 700, color: "#fff" }}>CreatorHub</div>
             <small style={{ color: "#9ca3af", fontSize: 11 }}>
               Build • Sell • Inspire
@@ -78,10 +82,11 @@ const SiteNavbar = () => {
           </div>
         </Navbar.Brand>
 
-        <Navbar.Toggle />
-        <Navbar.Collapse>
+        <Navbar.Toggle aria-controls="main-navbar" />
+
+        <Navbar.Collapse id="main-navbar">
           {/* LEFT LINKS */}
-          <Nav className="me-auto align-items-lg-center" style={{ gap: 12 }}>
+          <Nav className="me-auto mt-3 mt-lg-0 gap-2">
             <Nav.Link as={Link} to="/explore">
               Explore
             </Nav.Link>
@@ -94,7 +99,7 @@ const SiteNavbar = () => {
           </Nav>
 
           {/* RIGHT ACTIONS */}
-          <div className="ms-3 d-flex align-items-center" style={{ gap: 8 }}>
+          <div className="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
             {user ? (
               <>
                 {user.role === "admin" ? (
@@ -103,7 +108,8 @@ const SiteNavbar = () => {
                     to="/admin"
                     variant="outline-light"
                     size="sm"
-                    style={{ borderRadius: 10, fontWeight: 700 }}
+                    className="fw-semibold"
+                    style={{ borderRadius: 10 }}
                   >
                     Admin
                   </Button>
@@ -113,7 +119,8 @@ const SiteNavbar = () => {
                     to="/dashboard"
                     variant="outline-light"
                     size="sm"
-                    style={{ borderRadius: 10, fontWeight: 700 }}
+                    className="fw-semibold"
+                    style={{ borderRadius: 10 }}
                   >
                     Dashboard
                   </Button>
@@ -123,7 +130,8 @@ const SiteNavbar = () => {
                   variant="outline-danger"
                   size="sm"
                   onClick={handleLogout}
-                  style={{ borderRadius: 10, fontWeight: 700 }}
+                  className="fw-semibold"
+                  style={{ borderRadius: 10 }}
                 >
                   Logout
                 </Button>
@@ -134,7 +142,8 @@ const SiteNavbar = () => {
                 to="/login"
                 variant="light"
                 size="sm"
-                style={{ borderRadius: 10, fontWeight: 700 }}
+                className="fw-semibold"
+                style={{ borderRadius: 10 }}
               >
                 Get started
               </Button>

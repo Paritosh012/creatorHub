@@ -4,7 +4,6 @@ import ProductCard from "../../components/product/ProductCard";
 import { getAllProducts } from "../../services/productApi";
 import { useSearchParams } from "react-router-dom";
 
- 
 const categoryOptions = [
   { label: "All", value: null },
   { label: "UI Kits", value: "ui-kits" },
@@ -45,8 +44,9 @@ const Explore = () => {
       return;
     }
 
-    const filtered = allProducts.filter((p) => p.category === selectedCategory);
-
+    const filtered = allProducts.filter(
+      (p) => p.category === selectedCategory
+    );
     setProducts(filtered);
   }, [selectedCategory, allProducts]);
 
@@ -79,71 +79,79 @@ const Explore = () => {
   };
 
   return (
-    <main style={{ paddingTop: 40, paddingBottom: 40 }}>
+    <main className="py-4 py-md-5">
       <Container>
-        <div className="d-flex gap-2 mb-4" style={{ alignItems: "center" }}>
+        {/* SEARCH */}
+        <div className="d-flex flex-column flex-sm-row gap-2 mb-4">
           <Form.Control
             placeholder="Search assets..."
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={handleKeyPress}
             style={{
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.06)",
               color: "#e6eef2",
             }}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyPress}
           />
 
           <Button
             variant="outline-light"
-            style={{ borderRadius: 10 }}
+            style={{ borderRadius: 10, minWidth: 110 }}
             onClick={handleSearch}
           >
             Search
           </Button>
         </div>
 
+        {/* CATEGORIES */}
         <div className="d-flex gap-2 mb-4 flex-wrap">
-          {categoryOptions.map((cat) => (
-            <Button
-              key={cat.label}
-              size="sm"
-              variant={
-                selectedCategory === cat.value ||
-                (!selectedCategory && cat.value === null)
-                  ? "light"
-                  : "outline-light"
-              }
-              style={{ borderRadius: 20 }}
-              onClick={() => handleCategoryChange(cat.value)}
-            >
-              {cat.label}
-            </Button>
-          ))}
+          {categoryOptions.map((cat) => {
+            const active =
+              selectedCategory === cat.value ||
+              (!selectedCategory && cat.value === null);
+
+            return (
+              <Button
+                key={cat.label}
+                size="sm"
+                variant={active ? "light" : "outline-light"}
+                style={{
+                  borderRadius: 20,
+                  fontWeight: active ? 700 : 500,
+                }}
+                onClick={() => handleCategoryChange(cat.value)}
+              >
+                {cat.label}
+              </Button>
+            );
+          })}
         </div>
 
-        <Row className="g-4">
-          {products.length > 0 ? (
-            products.map((item) => (
+        {/* CONTENT */}
+        {loading ? (
+          <div className="d-flex justify-content-center py-5">
+            <Spinner animation="border" variant="light" />
+          </div>
+        ) : products.length > 0 ? (
+          <Row className="g-3 g-md-4">
+            {products.map((item) => (
               <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
                 <ProductCard product={item} />
               </Col>
-            ))
-          ) : loading ? (
-            <Spinner animation="grow" variant="light" />
-          ) : (
-            <div
-              style={{
-                color: "#9ca3af",
-                marginTop: 40,
-                textAlign: "center",
-                width: "100%",
-              }}
-            >
-              No results found.
-            </div>
-          )}
-        </Row>
+            ))}
+          </Row>
+        ) : (
+          <div
+            style={{
+              color: "#9ca3af",
+              marginTop: 60,
+              textAlign: "center",
+            }}
+          >
+            No results found.
+          </div>
+        )}
       </Container>
     </main>
   );

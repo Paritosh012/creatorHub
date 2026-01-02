@@ -30,37 +30,37 @@ const Footer = () => {
         backdropFilter: "blur(8px)",
       }}
     >
-      <Container style={{ paddingTop: 50, paddingBottom: 34 }}>
-        {/* ========= TOP SECTION ========= */}
-        <Row className="gy-5 align-items-start">
-          {/* LEFT: Brand & Quick Upload */}
+      <Container className="py-4 py-md-5">
+        {/* TOP */}
+        <Row className="gy-4">
+          {/* BRAND */}
           <Col md={4}>
             <Link
               to="/"
-              className="d-flex align-items-center text-decoration-none"
+              className="d-flex align-items-center text-decoration-none gap-2"
             >
               <div
                 style={{
-                  height: 44,
-                  width: 44,
-                  borderRadius: 12,
+                  height: 40,
+                  width: 40,
+                  borderRadius: 10,
                   background: "linear-gradient(135deg,#7c3aed,#06b6d4)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "white",
                   fontWeight: 700,
-                  fontSize: 16,
+                  fontSize: 15,
                 }}
               >
                 CH
               </div>
 
-              <div style={{ marginLeft: 12 }}>
-                <div style={{ color: "#fff", fontSize: 20, fontWeight: 700 }}>
+              <div>
+                <div style={{ color: "#fff", fontSize: 18, fontWeight: 700 }}>
                   CreatorHub
                 </div>
-                <div style={{ color: "#9ca3af", fontSize: 13 }}>
+                <div style={{ color: "#9ca3af", fontSize: 12 }}>
                   Build. Sell. Inspire.
                 </div>
               </div>
@@ -68,10 +68,11 @@ const Footer = () => {
 
             <p
               style={{
-                marginTop: 15,
+                marginTop: 12,
                 color: "#9ca3af",
                 fontSize: 14,
                 lineHeight: 1.5,
+                maxWidth: 420,
               }}
             >
               CreatorHub is the digital marketplace built for designers,
@@ -85,22 +86,23 @@ const Footer = () => {
               as={Link}
               to="/dashboard/create"
               style={{
-                marginTop: 10,
+                marginTop: 8,
                 borderRadius: 10,
                 padding: "6px 14px",
+                fontWeight: 600,
               }}
             >
               Quick Upload →
             </Button>
           </Col>
 
-          {/* MIDDLE: Trending Tags */}
+          {/* TAGS */}
           <Col md={4}>
-            <h6 style={{ color: "#fff", fontWeight: 700, marginBottom: 12 }}>
+            <h6 style={{ color: "#fff", fontWeight: 700, marginBottom: 10 }}>
               Trending Categories
             </h6>
 
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            <div className="d-flex flex-wrap gap-2">
               {trendingTags.map((tag) => (
                 <Badge
                   key={tag}
@@ -116,7 +118,6 @@ const Footer = () => {
                     border: "1px solid rgba(255,255,255,0.04)",
                     fontWeight: 600,
                     borderRadius: 12,
-                    backdropFilter: "blur(4px)",
                   }}
                 >
                   {tag}
@@ -124,59 +125,48 @@ const Footer = () => {
               ))}
             </div>
 
-            <p style={{ marginTop: 10, fontSize: 13, color: "#9ca3af" }}>
+            <p style={{ marginTop: 8, fontSize: 13, color: "#9ca3af" }}>
               Explore the most popular asset categories this week.
             </p>
           </Col>
 
-          {/* RIGHT: Useful Links + Newsletter */}
+          {/* LINKS + NEWSLETTER */}
           <Col md={4}>
-            <h6 style={{ color: "#fff", fontWeight: 700, marginBottom: 14 }}>
+            <h6 style={{ color: "#fff", fontWeight: 700, marginBottom: 12 }}>
               Quick Links
             </h6>
 
-            <div className="d-flex flex-column" style={{ gap: 6 }}>
-              <Link
-                to="/about"
-                className="text-decoration-none"
-                style={{ color: "#9ca3af" }}
-              >
+            <div className="d-flex flex-column gap-1">
+              <Link to="/about" className="text-decoration-none text-muted">
                 About Us
               </Link>
-              <Link
-                to="/explore"
-                className="text-decoration-none"
-                style={{ color: "#9ca3af" }}
-              >
+              <Link to="/explore" className="text-decoration-none text-muted">
                 Explore Assets
               </Link>
-              <Link
-                to="/creators"
-                className="text-decoration-none"
-                style={{ color: "#9ca3af" }}
-              >
+              <Link to="/creators" className="text-decoration-none text-muted">
                 Top Creators
               </Link>
-              <Link
-                to="/pricing"
-                className="text-decoration-none"
-                style={{ color: "#9ca3af" }}
-              >
+              <Link to="/pricing" className="text-decoration-none text-muted">
                 Pricing
               </Link>
             </div>
 
-            <h6 style={{ marginTop: 20, color: "#fff", fontWeight: 700 }}>
+            <h6
+              style={{
+                marginTop: 18,
+                color: "#fff",
+                fontWeight: 700,
+              }}
+            >
               Stay Updated
             </h6>
 
             <Form
               onSubmit={(e) => e.preventDefault()}
-              style={{ marginTop: 10 }}
+              style={{ marginTop: 8, maxWidth: 360 }}
             >
               <InputGroup>
                 <Form.Control
-                  className="subscribe"
                   placeholder="Your email"
                   style={{
                     background: "rgba(255,255,255,0.05)",
@@ -197,42 +187,32 @@ const Footer = () => {
               </InputGroup>
             </Form>
 
-            <p style={{ marginTop: 8, color: "#9ca3af", fontSize: 12 }}>
+            <p style={{ marginTop: 6, color: "#9ca3af", fontSize: 12 }}>
               Get creator tips, updates & exclusive drops.
             </p>
           </Col>
         </Row>
 
-        <Row style={{ marginTop: 30 }} className="align-items-center">
-          <Col md={6}>
-            <p style={{ color: "#6b7280", fontSize: 13 }}>
+        {/* BOTTOM */}
+        <Row className="mt-4 align-items-center gy-2">
+          <Col xs={12} md={6}>
+            <p style={{ color: "#6b7280", fontSize: 13, marginBottom: 0 }}>
               © {new Date().getFullYear()} CreatorHub — All rights reserved.
             </p>
           </Col>
+
           <Col
+            xs={12}
             md={6}
-            className="d-flex justify-content-md-end"
-            style={{ gap: 18 }}
+            className="d-flex justify-content-md-end gap-3"
           >
-            <Link
-              to="/terms"
-              className="text-decoration-none"
-              style={{ color: "#9ca3af", fontSize: 13 }}
-            >
+            <Link to="/terms" className="text-decoration-none text-muted">
               Terms
             </Link>
-            <Link
-              to="/privacy"
-              className="text-decoration-none"
-              style={{ color: "#9ca3af", fontSize: 13 }}
-            >
+            <Link to="/privacy" className="text-decoration-none text-muted">
               Privacy
             </Link>
-            <Link
-              to="/support"
-              className="text-decoration-none"
-              style={{ color: "#9ca3af", fontSize: 13 }}
-            >
+            <Link to="/support" className="text-decoration-none text-muted">
               Support
             </Link>
           </Col>

@@ -25,9 +25,8 @@ const Register = () => {
         password,
       });
 
-      if (res.data.success) { 
+      if (res.data.success) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
-
         toast.success("You are successfully registered");
         navigate("/");
       }
@@ -37,16 +36,25 @@ const Register = () => {
   };
 
   return (
-    <Container style={{ maxWidth: 420, paddingTop: 80 }}>
+    <Container className="d-flex justify-content-center py-4 py-md-5">
       <Card
         style={{
           background: "rgba(255,255,255,0.04)",
           border: "1px solid rgba(255,255,255,0.08)",
           borderRadius: 16,
+          width: "100%",
+          maxWidth: 420,
         }}
       >
-        <Card.Body>
-          <h3 style={{ color: "#fff", fontWeight: 800, marginBottom: 20 }}>
+        <Card.Body style={{ padding: "26px 22px" }}>
+          <h3
+            style={{
+              color: "#fff",
+              fontWeight: 800,
+              marginBottom: 18,
+              fontSize: 22,
+            }}
+          >
             Create Account
           </h3>
 
@@ -58,6 +66,11 @@ const Register = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
               />
             </Form.Group>
 
@@ -68,6 +81,11 @@ const Register = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
               />
             </Form.Group>
 
@@ -78,20 +96,39 @@ const Register = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                style={{
+                  background: "rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  color: "#fff",
+                }}
               />
             </Form.Group>
 
             <Button
               type="submit"
               variant="light"
-              style={{ width: "100%", fontWeight: 700 }}
+              className="w-100"
+              style={{
+                fontWeight: 700,
+                padding: "10px 0",
+                borderRadius: 10,
+              }}
             >
               Sign Up
             </Button>
           </Form>
 
-          <p style={{ marginTop: 16, fontSize: 14, color: "#9ca3af" }}>
-            Already have an account? <Link to="/login">Login</Link>
+          <p
+            style={{
+              marginTop: 16,
+              fontSize: 14,
+              color: "#9ca3af",
+            }}
+          >
+            Already have an account?{" "}
+            <Link to="/login" style={{ color: "#06b6d4" }}>
+              Login
+            </Link>
           </p>
         </Card.Body>
       </Card>
