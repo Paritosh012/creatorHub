@@ -39,13 +39,7 @@ const SiteNavbar = () => {
   };
 
   /* ---------------- LOADING STATE ---------------- */
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center py-2">
-        <Spinner size="sm" />
-      </div>
-    );
-  }
+ 
 
   return (
     <Navbar
