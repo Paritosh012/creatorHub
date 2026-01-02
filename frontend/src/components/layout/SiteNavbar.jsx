@@ -10,7 +10,6 @@ const SiteNavbar = () => {
   const location = useLocation();
 
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
   /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
   useEffect(() => {
@@ -32,6 +31,7 @@ const SiteNavbar = () => {
       await api.post("/auth/logout");
       setUser(null);
       toast.success("Logged out successfully");
+      localStorage.clear();
       navigate("/login");
     } catch {
       toast.error("Logout failed");
@@ -39,7 +39,6 @@ const SiteNavbar = () => {
   };
 
   /* ---------------- LOADING STATE ---------------- */
- 
 
   return (
     <Navbar
