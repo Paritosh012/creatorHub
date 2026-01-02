@@ -16,12 +16,10 @@ const SiteNavbar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get("/auth/me");
+        const res = await api.get("/api/auth/me");
         setUser(res.data.user);
       } catch {
         setUser(null);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -62,7 +60,6 @@ const SiteNavbar = () => {
       }}
     >
       <Container fluid="lg">
-        {/* BRAND */}
         <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
           <div
             style={{
