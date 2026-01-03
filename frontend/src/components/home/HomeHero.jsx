@@ -1,11 +1,4 @@
-import {
-  Container,
-  Row,
-  Col,
-  Button,
-  Modal,
-  Form,
-} from "react-bootstrap";
+import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import api from "../../services/api";
@@ -21,7 +14,7 @@ const HomeHero = () => {
   const [form, setForm] = useState({
     title: "",
     price: "",
-    category: "ui-kits",
+    category: "",
     description: "",
   });
 
@@ -171,7 +164,10 @@ const HomeHero = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowCreatorModal(false)}>
+          <Button
+            variant="secondary"
+            onClick={() => setShowCreatorModal(false)}
+          >
             Cancel
           </Button>
           <Button onClick={handleBecomeCreator}>Confirm</Button>
@@ -205,6 +201,17 @@ const HomeHero = () => {
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
+
+            <Form.Select
+              className="mb-2"
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+            >
+              <option value="ui-kits">UI Kits</option>
+              <option value="templates">Templates</option>
+              <option value="icons">Icons</option>
+              <option value="3d-assets">3D Assets</option>
+            </Form.Select>
 
             <Form.Control
               className="mb-2"
