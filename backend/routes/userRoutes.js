@@ -5,7 +5,7 @@ const { createProduct } = require("../controllers/productController");
 
 const router = express.Router();
 
-router.put("/become-creator", verifyToken, becomeCreator);
+router.get("/become-creator", verifyToken, becomeCreator);
 router.post("/dashboard/create", verifyToken, createProduct);
 
 module.exports = router;
