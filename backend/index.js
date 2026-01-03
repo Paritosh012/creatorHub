@@ -24,13 +24,13 @@ if (!process.env.DBCONNECTIONSTRING) {
 
 app.use(
   cors({
-    origin: ["https://creator-hub-82iz.vercel.app"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    origin: "https://creator-hub-82iz.vercel.app",
     credentials: true,
   })
 );
+
 app.use(cookieParser());
+app.set("trust proxy", 1);
 
 app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true, limit: "2mb" }));

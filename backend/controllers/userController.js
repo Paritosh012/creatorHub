@@ -3,11 +3,13 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
 require("dotenv").config();
 
+const isProd = process.env.NODE_ENV === "production";
+
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: true,       // MUST be false on localhost
-  sameSite: "none",     // MUST be lax on localhost
-  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  secure: isProd,
+  sameSite: isProd ? "none" : "lax",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
 };
 
 const registerUser = async (req, res) => {
@@ -119,9 +121,7 @@ const loginUser = async (req, res) => {
 
 const me = async (req, res) => {
   try {
-    const user = await userModel
-      .findById(req.user.id)
-      .select("-password");
+    const user = await userModel.findById(req.user.id).select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -158,9 +158,10 @@ const logoutUser = (req, res) => {
   res
     .clearCookie("token", {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax",
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
     })
+
     .json({ success: true, msg: "Logged out" });
 };
 
