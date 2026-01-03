@@ -8,7 +8,9 @@ const getAllProducts = async (req, res) => {
     if (req.query.popular === "true") filter.isPopular = true;
     if (req.query.category) filter.category = req.query.category;
 
-    const products = await Product.find(filter).sort({ createdAt: -1 });
+    const products = await Product.find(filter)
+      .populate("creator", "name")
+      .sort({ createdAt: -1 });
 
     res.json({
       success: true,
@@ -21,7 +23,11 @@ const getAllProducts = async (req, res) => {
 
 const getProductBySlug = async (req, res) => {
   try {
-    const product = await Product.findOne({ slug: req.params.slug });
+    const product = await Product.findOne({ slug: req.params.slug }).populate(
+      "creator",
+      "name"
+    );
+
     if (!product) {
       return res.status(404).json({ success: false });
     }
@@ -77,9 +83,9 @@ const getCreatorProducts = async (req, res) => {
   try {
     const creatorId = req.user.id;
 
-    const products = await Product.find({ creator: creatorId }).sort({
-      createdAt: -1,
-    });
+    const products = await Product.find({ creator: creatorId })
+      .populate("creator", "name")
+      .sort({ createdAt: -1 });
 
     res.json({
       success: true,

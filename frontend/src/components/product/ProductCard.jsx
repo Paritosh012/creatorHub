@@ -89,7 +89,7 @@ const ProductCard = ({ product }) => {
             marginBottom: 10,
           }}
         >
-          by {product.creator}
+          by {product.creator?.name || "Unknown"}
         </div>
 
         {/* Tags */}
