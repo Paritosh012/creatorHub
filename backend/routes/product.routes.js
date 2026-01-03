@@ -16,7 +16,7 @@ router.get("/creator", verifyToken, getCreatorProducts);
 router.get("/:slug", getProductBySlug);
 
 router.post(
-  "/users/dashboard/create",
+  "/dashboard/create",
   verifyToken,
   upload.fields([
     { name: "thumbnail", maxCount: 1 },

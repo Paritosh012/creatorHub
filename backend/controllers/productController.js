@@ -31,7 +31,6 @@ const getProductBySlug = async (req, res) => {
   }
 };
 
-
 const createProduct = async (req, res) => {
   try {
     const { title, description, price, category, isFree, tags } = req.body;
@@ -40,14 +39,14 @@ const createProduct = async (req, res) => {
       return res.status(400).json({ msg: "Files are required" });
     }
 
-    // Upload thumbnail
+    const slug = await generateUniqueSlug(title);
+
     const thumbnailUpload = await uploadToCloudinary(
       req.files.thumbnail[0].buffer,
       "creatorhub/thumbnails",
       "image"
     );
 
-    // Upload product file
     const fileUpload = await uploadToCloudinary(
       req.files.file[0].buffer,
       "creatorhub/products",
@@ -56,25 +55,24 @@ const createProduct = async (req, res) => {
 
     const product = await Product.create({
       title,
+      slug,
       description,
-      price,
-      isFree,
+      price: Number(price),
+      isFree: isFree === "true",
       category,
-      tags,
+      tags: Array.isArray(tags) ? tags : [tags],
       thumbnail: thumbnailUpload.secure_url,
       fileUrl: fileUpload.secure_url,
       creator: req.user.id,
     });
 
-    res.status(201).json({
-      success: true,
-      product,
-    });
+    res.status(201).json({ success: true, product });
   } catch (err) {
     console.error("Create product error:", err);
     res.status(500).json({ msg: "Server error" });
   }
 };
+
 
 const getCreatorProducts = async (req, res) => {
   try {

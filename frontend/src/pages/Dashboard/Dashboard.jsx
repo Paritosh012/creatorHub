@@ -69,7 +69,7 @@ const Dashboard = () => {
       fd.append("thumbnail", thumbnailFile);
       fd.append("file", productFile);
 
-      const res = await api.post("/users/dashboard/create", fd, {
+      const res = await api.post("/products/dashboard/create", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -250,7 +250,7 @@ const Dashboard = () => {
               type="file"
               accept="image/*"
               onChange={(e) => setThumbnailFile(e.target.files[0])}
-            />
+            /> 
 
             <Form.Control
               type="file"
