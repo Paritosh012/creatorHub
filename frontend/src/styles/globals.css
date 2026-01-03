@@ -44,3 +44,17 @@ html, body, #root {
   transform: translateY(-4px);
   border-color: var(--soft-border-strong);
 }
+/* Make placeholders visible on dark glass inputs */
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.45);
+  opacity: 1; /* critical for Firefox */
+}
+
+/* For Safari / older browsers */
+.form-control::-webkit-input-placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.form-control:-ms-input-placeholder {
+  color: rgba(255, 255, 255, 0.45);
+}
