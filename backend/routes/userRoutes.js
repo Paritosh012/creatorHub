@@ -8,4 +8,7 @@ const router = express.Router();
 router.get("/become-creator", verifyToken, becomeCreator);
 router.post("/dashboard/create", verifyToken, createProduct);
 
+// GET PROFILE
+router.get("/creator/:id", getCreatorProfile);
+
 module.exports = router;
