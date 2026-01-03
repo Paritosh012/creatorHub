@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router-dom"; 
+import { Container, Row, Col } from "react-bootstrap"; 
 import api from "../services/api";
-import { Container, Row, Col } from "react-bootstrap";
-import ProductCard from "../components/ProductCard";
+import ProductCard from "../components/product/ProductCard";
 
 const CreatorProfile = () => {
   const { id } = useParams();
