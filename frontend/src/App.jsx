@@ -10,8 +10,9 @@ import Register from "./pages/Auth/Register";
 import ProductDetails from "./components/product/ProductsDetails";
 import Checkout from "./pages/Checkout/Checkout";
 import Success from "./pages/Checkout/Success";
-import Admin from "./pages/Admin/Admin"; 
+import Admin from "./pages/Admin/Admin";
 import Dashboard from "./pages/Dashboard/Dashboard";
+import CreatorProfile from "./pages/CreatorProfile";
 
 const App = () => {
   return (
@@ -27,8 +28,9 @@ const App = () => {
           <Route path="product/:slug" element={<ProductDetails />} />
           <Route path="checkout" element={<Checkout />} />
           <Route path="success" element={<Success />} />
-          <Route path="admin" element={<Admin />} /> 
+          <Route path="admin" element={<Admin />} />
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="creator/:id" element={<CreatorProfile />} />
         </Route>
 
         {/* 404 */}

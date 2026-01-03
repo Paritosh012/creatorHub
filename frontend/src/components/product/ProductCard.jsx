@@ -83,13 +83,13 @@ const ProductCard = ({ product }) => {
         </h6>
 
         <div
-          style={{
-            color: "#9ca3af",
-            fontSize: 13,
-            marginBottom: 10,
+          style={{ color: "#9ca3af", fontSize: 13 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/creator/${product.creator._id}`);
           }}
         >
-          by {product.creator?.name || "Unknown"}
+          by {product.creator.name}
         </div>
 
         {/* Tags */}

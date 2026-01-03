@@ -45,4 +45,8 @@ router.delete("/:id", verifyToken, deleteProduct);
 /* ✅ SINGLE PRODUCT (ALWAYS LAST) */
 router.get("/:slug", getProductBySlug);
 
+// GET PROFILE
+router.get("/creator/:id", getCreatorProfile);
+
+
 module.exports = router;
