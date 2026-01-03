@@ -7,30 +7,33 @@ import { toast } from "react-toastify";
 
 const SiteNavbar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const [user, setUser] = useState(null);
 
   /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get("/auth/me");
+        const res = await api.get("/auth/me", { withCredentials: true });
         setUser(res.data.user);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
       } catch {
         setUser(null);
+        localStorage.removeItem("user");
       }
     };
 
-    checkAuth();
-  }, [location.pathname]);
+    if (!user) {
+      checkAuth();
+    }
+  }, []);
 
   /* ---------------- LOGOUT ---------------- */
   const handleLogout = async () => {
     try {
       await api.post("/auth/logout");
-      setUser(null);
       toast.success("Logged out successfully");
-      localStorage.clear();
+      localStorage.removeItem("user");
+      setUser(null);
       navigate("/login");
     } catch {
       toast.error("Logout failed");

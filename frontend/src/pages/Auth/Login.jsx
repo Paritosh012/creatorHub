@@ -21,7 +21,6 @@ const Login = () => {
       if (res.data.success) {
         localStorage.setItem("user", JSON.stringify(res.data.user));
         toast.success("Login successful 🎉");
-
         setTimeout(() => {
           navigate("/");
         }, 1500);
