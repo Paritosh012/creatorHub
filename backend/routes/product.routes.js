@@ -1,51 +1,31 @@
-const express = require("express");
-const router = express.Router();
-const {
-  getAllProducts,
-  getProductBySlug,
-  getCreatorProducts,
-  deleteProduct,
-  updateProduct,
-  createProduct,
-} = require("../controllers/productController");
-const verifyToken = require("../middlewares/verifyToken");
+const router = require("express").Router();
+const verify = require("../middlewares/verifyToken");
 const upload = require("../middlewares/upload");
+const c = require("../controllers/product.controller");
 
-/* ✅ LIST PRODUCTS (FIRST) */
-router.get("/", getAllProducts);
+router.get("/", c.getAll);
+router.get("/:slug", c.getOne);
 
-/* ✅ CREATOR PRODUCTS */
-router.get("/creator", verifyToken, getCreatorProducts);
-
-/* ✅ CREATE */
 router.post(
-  "/dashboard/create",
-  verifyToken,
+  "/",
+  verify,
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "file", maxCount: 1 },
   ]),
-  createProduct
+  c.create
 );
 
-/* ✅ UPDATE */
 router.put(
   "/:id",
-  verifyToken,
+  verify,
   upload.fields([
     { name: "thumbnail", maxCount: 1 },
     { name: "file", maxCount: 1 },
   ]),
-  updateProduct
+  c.update
 );
 
-/* ✅ DELETE */
-router.delete("/:id", verifyToken, deleteProduct);
-
-/* ✅ SINGLE PRODUCT (ALWAYS LAST) */
-router.get("/:slug", getProductBySlug);
-
-
-
+router.delete("/:id", verify, c.remove);
 
 module.exports = router;

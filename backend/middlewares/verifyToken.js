@@ -1,25 +1,14 @@
 const jwt = require("jsonwebtoken");
 
-const verifyToken = (req, res, next) => {
+module.exports = (req, res, next) => {
   const token = req.cookies.token;
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      msg: "Not authenticated",
-    });
-  }
+  if (!token)
+    return res.status(401).json({ success: false });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
-  } catch (err) {
-    return res.status(401).json({
-      success: false,
-      msg: "Invalid token",
-    });
+  } catch {
+    res.status(401).json({ success: false });
   }
 };
-
-module.exports = verifyToken;

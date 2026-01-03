@@ -1,26 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-require("dotenv").config();
 const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
-const adminRoutes = require("./routes/adminRoutes");
-const userRoutes = require("./routes/userRoutes");
+const userRoutes = require("./routes/user.routes")
 
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-if (!process.env.JWT_SECRET) {
-  console.error("❌ JWT_SECRET is missing in .env");
+if (!process.env.JWT_SECRET || !process.env.DBCONNECTIONSTRING) {
+  console.error("❌ Missing env variables");
   process.exit(1);
 }
 
-if (!process.env.DBCONNECTIONSTRING) {
-  console.error("❌ DBCONNECTIONSTRING is missing in .env");
-  process.exit(1);
-}
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -30,34 +26,24 @@ app.use(
 );
 
 app.use(cookieParser());
-app.set("trust proxy", 1);
-
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true, limit: "2mb" }));
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/products", productRoutes);
 
 app.use((err, req, res, next) => {
   console.error("Unhandled error:", err);
-  res.status(500).json({
-    success: false,
-    msg: "Internal server error",
-  });
+  res.status(500).json({ success: false, msg: "Server error" });
 });
 
 mongoose
   .connect(process.env.DBCONNECTIONSTRING)
   .then(() => {
     console.log("✅ MongoDB connected");
-
-    app.listen(PORT, () => {
-      console.log(`🚀 Server running at http://localhost:${PORT}`);
-    });
+    app.listen(PORT, () =>
+      console.log(`🚀 Server running on port ${PORT}`)
+    );
   })
-  .catch((err) => {
-    console.error("❌ MongoDB connection failed:", err);
-    process.exit(1);
-  });
+  .catch(() => process.exit(1));

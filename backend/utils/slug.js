@@ -1,4 +1,4 @@
-const Product = require("../models/productModel");
+const Product = require("../models/product.model");
 
 const slugify = (text) =>
   text
@@ -7,7 +7,7 @@ const slugify = (text) =>
     .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-");
 
-const generateUniqueSlug = async (title) => {
+module.exports = async (title) => {
   const base = slugify(title);
   let slug = base;
   let count = 1;
@@ -18,5 +18,3 @@ const generateUniqueSlug = async (title) => {
 
   return slug;
 };
-
-module.exports = generateUniqueSlug;
