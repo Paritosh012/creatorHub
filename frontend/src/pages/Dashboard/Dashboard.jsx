@@ -1,39 +1,60 @@
+import { useEffect, useState } from "react";
+import api from "../../services/api";
 import {
   Container,
   Row,
   Col,
+  Card,
   Button,
+  Spinner,
   Modal,
   Form,
 } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
-import api from "../../services/api";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
-const HomeHero = () => {
+const Dashboard = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
-  const [showCreatorModal, setShowCreatorModal] = useState(false);
-  const [showProductModal, setShowProductModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
+
+  const [showModal, setShowModal] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const [form, setForm] = useState({
     title: "",
     price: "",
     category: "ui-kits",
-    thumbnail: null, // file
-    file: null, // file
+    thumbnail: "",
+    fileUrl: "",
     description: "",
   });
 
-  const isCreator = user?.role === "creator";
+  const user = JSON.parse(localStorage.getItem("user"));
 
+  /* ---------------- FETCH PRODUCTS ---------------- */
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const res = await api.get("/products/creator");
+        setProducts(res.data.products || []);
+      } catch {
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
+  /* ---------------- CREATE ---------------- */
   const handleCreateProduct = async () => {
     if (
       !form.title ||
       !form.thumbnail ||
-      !form.file ||
+      !form.fileUrl ||
       !form.description.trim()
     ) {
       toast.error("All fields are required");
@@ -43,194 +64,243 @@ const HomeHero = () => {
     try {
       const priceValue = Number(form.price || 0);
 
-      await api.post("/users/dashboard/create", {
+      const res = await api.post("/users/dashboard/create", {
         title: form.title,
         description: form.description,
         price: priceValue,
         isFree: priceValue === 0,
         category: form.category,
-        thumbnail: form.thumbnail, // placeholder (will change later)
-        fileUrl: form.file, // placeholder
+        thumbnail: form.thumbnail,
+        fileUrl: form.fileUrl,
         tags: [form.category],
       });
 
       toast.success("Product uploaded 🚀");
-      setShowProductModal(false);
-      navigate("/dashboard");
+
+      setProducts((prev) => [res.data.product, ...prev]);
+      closeModal();
     } catch (err) {
       toast.error(err.response?.data?.msg || "Upload failed");
     }
   };
 
-  const handleBecomeCreator = async () => {
-    try {
-      const res = await api.put("/users/become-creator");
+  /* ---------------- EDIT ---------------- */
+  const handleEditOpen = (product) => {
+    setEditingId(product._id);
+    setForm({
+      title: product.title,
+      price: product.price,
+      category: product.category,
+      thumbnail: product.thumbnail,
+      fileUrl: product.fileUrl,
+      description: product.description,
+    });
+    setShowModal(true);
+  };
 
-      if (res.data.success) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        toast.success("You are now a creator 🚀");
-        setShowCreatorModal(false);
-        navigate("/dashboard");
-      }
+  const handleUpdateProduct = async () => {
+    try {
+      const priceValue = Number(form.price || 0);
+
+      const res = await api.put(`/products/${editingId}`, {
+        title: form.title,
+        description: form.description,
+        price: priceValue,
+        isFree: priceValue === 0,
+        category: form.category,
+        thumbnail: form.thumbnail,
+        fileUrl: form.fileUrl,
+        tags: [form.category],
+      });
+
+      toast.success("Product updated");
+
+      setProducts((prev) =>
+        prev.map((p) => (p._id === editingId ? res.data.product : p))
+      );
+
+      closeModal();
     } catch {
-      toast.error("Failed to become creator");
+      toast.error("Update failed");
     }
   };
 
+  const handleDeleteProduct = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this product?"))
+      return;
+
+    try {
+      await api.delete(`/products/${id}`);
+      toast.success("Product deleted");
+
+      setProducts((prev) => prev.filter((p) => p._id !== id));
+    } catch {
+      toast.error("Delete failed");
+    }
+  };
+
+  /* ---------------- MODAL RESET ---------------- */
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingId(null);
+    setForm({
+      title: "",
+      price: "",
+      category: "ui-kits",
+      thumbnail: "",
+      fileUrl: "",
+      description: "",
+    });
+  };
+
+  /* ---------------- LOADING ---------------- */
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center mt-5">
+        <Spinner />
+      </div>
+    );
+  }
+
+  /* ---------------- UI ---------------- */
   return (
-    <>
-      {/* HERO */}
-      <section className="py-4 py-md-5">
-        <Container>
-          <Row className="align-items-center gy-4">
-            {/* TEXT */}
-            <Col lg={6}>
-              <h1
-                style={{
-                  color: "#fff",
-                  fontWeight: 800,
-                  fontSize: "clamp(28px, 4vw, 42px)",
-                }}
-              >
-                A Premium Marketplace for Creators
-              </h1>
+    <Container style={{ paddingTop: 40 }}>
+      <h2 style={{ color: "#fff", fontWeight: 800 }}>
+        Welcome, {user?.name || "Creator"}
+      </h2>
+      <p style={{ color: "#9ca3af" }}>Manage your products</p>
 
-              <p
-                style={{
-                  color: "#9ca3af",
-                  marginTop: 14,
-                  fontSize: 15,
-                  maxWidth: 520,
-                }}
-              >
-                Sell UI kits, templates, icons, and digital assets.
-              </p>
+      {/* STATS */}
+      <Row className="g-4 mt-3">
+        <Col md={4}>
+          <Card className="p-3 bg-dark border-secondary">
+            <h6>Total Products</h6>
+            <h3>{products.length}</h3>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="p-3 bg-dark border-secondary">
+            <h6>Total Downloads</h6>
+            <h3>{products.reduce((s, p) => s + (p.downloads || 0), 0)}</h3>
+          </Card>
+        </Col>
+        <Col md={4}>
+          <Card className="p-3 bg-dark border-secondary">
+            <h6>Status</h6>
+            <h3>Creator</h3>
+          </Card>
+        </Col>
+      </Row>
 
-              <div className="d-flex flex-column flex-sm-row gap-3 mt-4">
-                <Button as={Link} to="/explore">
-                  Explore Assets
-                </Button>
+      {/* ACTIONS */}
+      <div className="d-flex gap-2 mt-4">
+        <Button onClick={() => setShowModal(true)}>Add New Product</Button>
+        <Button variant="outline-light" onClick={() => navigate("/explore")}>
+          Explore Marketplace
+        </Button>
+      </div>
 
-                {user ? (
-                  isCreator ? (
-                    <Button onClick={() => setShowProductModal(true)}>
-                      Upload your product
-                    </Button>
-                  ) : (
+      {/* PRODUCTS */}
+      <h4 className="mt-5">Your Products</h4>
+
+      {products.length === 0 ? (
+        <p style={{ color: "#9ca3af" }}>
+          You haven’t created any products yet.
+        </p>
+      ) : (
+        <Row className="g-4 mt-2">
+          {products.map((p) => (
+            <Col md={4} key={p._id}>
+              <Card className="bg-dark border-secondary">
+                <Card.Img
+                  variant="top"
+                  src={p.thumbnail}
+                  style={{ height: 160, objectFit: "cover" }}
+                />
+                <Card.Body>
+                  <h6>{p.title}</h6>
+                  <p style={{ color: "#9ca3af", fontSize: 13 }}>
+                    {p.price === 0 ? "Free" : `₹${p.price}`}
+                  </p>
+
+                  <div className="d-flex gap-2">
                     <Button
+                      size="sm"
                       variant="outline-light"
-                      onClick={() => setShowCreatorModal(true)}
+                      onClick={() => handleEditOpen(p)}
                     >
-                      Become a Creator
+                      Edit
                     </Button>
-                  )
-                ) : (
-                  <Button
-                    variant="outline-light"
-                    onClick={() => navigate("/login")}
-                  >
-                    Become a Creator
-                  </Button>
-                )}
-              </div>
+
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={() => handleDeleteProduct(p._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
             </Col>
+          ))}
+        </Row>
+      )}
 
-            {/* IMAGE */}
-            <Col lg={6}>
-              <img
-                src="https://picsum.photos/seed/creatorhub/900/560"
-                alt="preview"
-                style={{
-                  width: "100%",
-                  borderRadius: 14,
-                  maxHeight: 420,
-                  objectFit: "cover",
-                }}
-              />
-            </Col>
-          </Row>
-        </Container>
-      </section>
-
-      {/* BECOME CREATOR MODAL */}
-      <Modal
-        show={showCreatorModal}
-        onHide={() => setShowCreatorModal(false)}
-        centered
-        size="sm"
-      >
+      {/* MODAL */}
+      <Modal show={showModal} onHide={closeModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Become a Creator</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          You’ll be able to upload and sell products on CreatorHub.
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowCreatorModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleBecomeCreator}>Confirm</Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* PRODUCT UPLOAD MODAL */}
-      <Modal
-        show={showProductModal}
-        onHide={() => setShowProductModal(false)}
-        centered
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Upload New Product</Modal.Title>
+          <Modal.Title>
+            {editingId ? "Edit Product" : "Upload New Product"}
+          </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
           <Form>
             <Form.Control
               className="mb-2"
-              placeholder="Title"
+              placeholder="Product title"
               value={form.title}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
             />
 
             <Form.Control
               className="mb-2"
+              placeholder="Price (0 for free)"
               type="number"
-              placeholder="Price (0 = free)"
               value={form.price}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
 
-            <Form.Group className="mb-2">
-              <Form.Label>Thumbnail Image</Form.Label>
-              <Form.Control
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  setForm({ ...form, thumbnail: e.target.files[0] })
-                }
-              />
-            </Form.Group>
+            <Form.Select
+              className="mb-2"
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+            >
+              <option value="ui-kits">UI Kits</option>
+              <option value="templates">Templates</option>
+              <option value="icons">Icons</option>
+              <option value="3d-assets">3D Assets</option>
+            </Form.Select>
 
-            <Form.Group className="mb-2">
-              <Form.Label>Product File</Form.Label>
-              <Form.Control
-                type="file"
-                onChange={(e) =>
-                  setForm({ ...form, file: e.target.files[0] })
-                }
-              />
-            </Form.Group>
+            <Form.Control
+              className="mb-2"
+              placeholder="Thumbnail URL"
+              value={form.thumbnail}
+              onChange={(e) => setForm({ ...form, thumbnail: e.target.value })}
+            />
+
+            <Form.Control
+              className="mb-2"
+              placeholder="Download file URL"
+              value={form.fileUrl}
+              onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
+            />
 
             <Form.Control
               as="textarea"
               rows={3}
-              placeholder="Description"
+              placeholder="Product description"
               value={form.description}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
@@ -240,17 +310,18 @@ const HomeHero = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowProductModal(false)}
-          >
+          <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button onClick={handleCreateProduct}>Upload</Button>
+          <Button
+            onClick={editingId ? handleUpdateProduct : handleCreateProduct}
+          >
+            {editingId ? "Update" : "Upload"}
+          </Button>
         </Modal.Footer>
       </Modal>
-    </>
+    </Container>
   );
 };
 
-export default HomeHero;
+export default Dashboard;
