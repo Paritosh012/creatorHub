@@ -9,7 +9,7 @@ const productRoutes = require("./routes/product.routes");
 const userRoutes = require("./routes/user.routes")
 
 const app = express();
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 8000; 
 
 if (!process.env.JWT_SECRET || !process.env.DBCONNECTIONSTRING) {
   console.error("❌ Missing env variables");

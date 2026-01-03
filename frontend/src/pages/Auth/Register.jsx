@@ -68,7 +68,6 @@ const Register = () => {
                 required
                 style={{
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff",
                 }}
               />
             </Form.Group>
@@ -82,7 +81,6 @@ const Register = () => {
                 required
                 style={{
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff",
                 }}
               />
             </Form.Group>
@@ -96,7 +94,6 @@ const Register = () => {
                 required
                 style={{
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff",
                 }}
               />
             </Form.Group>
