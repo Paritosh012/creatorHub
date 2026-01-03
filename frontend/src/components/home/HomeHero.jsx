@@ -22,47 +22,53 @@ const HomeHero = () => {
     title: "",
     price: "",
     category: "ui-kits",
-    thumbnail: null, // file
-    file: null, // file
     description: "",
   });
 
+  const [thumbnailFile, setThumbnailFile] = useState(null);
+  const [productFile, setProductFile] = useState(null);
+
   const isCreator = user?.role === "creator";
 
-    const handleCreateProduct = async () => {
+  /* ---------------- CREATE PRODUCT ---------------- */
+  const handleCreateProduct = async () => {
     if (
       !form.title ||
-      !form.thumbnail ||
-      !form.file ||
-      !form.description.trim()
+      !form.description.trim() ||
+      !thumbnailFile ||
+      !productFile
     ) {
-      toast.error("All fields are required");
+      toast.error("All fields and files are required");
       return;
     }
 
     try {
+      const fd = new FormData();
       const priceValue = Number(form.price || 0);
 
-      await api.post("/users/dashboard/create", {
-        title: form.title,
-        description: form.description,
-        price: priceValue,
-        isFree: priceValue === 0,
-        category: form.category,
-        thumbnail: form.thumbnail, // placeholder (will change later)
-        fileUrl: form.file, // placeholder
-        tags: [form.category],
+      fd.append("title", form.title);
+      fd.append("description", form.description);
+      fd.append("price", priceValue);
+      fd.append("isFree", priceValue === 0);
+      fd.append("category", form.category);
+      fd.append("tags", form.category);
+      fd.append("thumbnail", thumbnailFile);
+      fd.append("file", productFile);
+
+      await api.post("/users/dashboard/create", fd, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
 
       toast.success("Product uploaded 🚀");
       setShowProductModal(false);
+      resetForm();
       navigate("/dashboard");
     } catch (err) {
       toast.error(err.response?.data?.msg || "Upload failed");
     }
   };
 
-
+  /* ---------------- BECOME CREATOR ---------------- */
   const handleBecomeCreator = async () => {
     try {
       const res = await api.put("/users/become-creator");
@@ -78,32 +84,29 @@ const HomeHero = () => {
     }
   };
 
+  const resetForm = () => {
+    setForm({
+      title: "",
+      price: "",
+      category: "ui-kits",
+      description: "",
+    });
+    setThumbnailFile(null);
+    setProductFile(null);
+  };
+
   return (
     <>
       {/* HERO */}
       <section className="py-4 py-md-5">
         <Container>
           <Row className="align-items-center gy-4">
-            {/* TEXT */}
             <Col lg={6}>
-              <h1
-                style={{
-                  color: "#fff",
-                  fontWeight: 800,
-                  fontSize: "clamp(28px, 4vw, 42px)",
-                }}
-              >
+              <h1 style={{ color: "#fff", fontWeight: 800 }}>
                 A Premium Marketplace for Creators
               </h1>
 
-              <p
-                style={{
-                  color: "#9ca3af",
-                  marginTop: 14,
-                  fontSize: 15,
-                  maxWidth: 520,
-                }}
-              >
+              <p style={{ color: "#9ca3af", marginTop: 14 }}>
                 Sell UI kits, templates, icons, and digital assets.
               </p>
 
@@ -136,7 +139,6 @@ const HomeHero = () => {
               </div>
             </Col>
 
-            {/* IMAGE */}
             <Col lg={6}>
               <img
                 src="https://picsum.photos/seed/creatorhub/900/560"
@@ -160,7 +162,7 @@ const HomeHero = () => {
         centered
         size="sm"
       >
-        <Modal.Header closeButton> 
+        <Modal.Header closeButton>
           <Modal.Title>Become a Creator</Modal.Title>
         </Modal.Header>
 
@@ -169,10 +171,7 @@ const HomeHero = () => {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowCreatorModal(false)}
-          >
+          <Button variant="secondary" onClick={() => setShowCreatorModal(false)}>
             Cancel
           </Button>
           <Button onClick={handleBecomeCreator}>Confirm</Button>
@@ -209,18 +208,15 @@ const HomeHero = () => {
 
             <Form.Control
               className="mb-2"
-              placeholder="Thumbnail URL"
-              value={form.thumbnail}
-              onChange={(e) =>
-                setForm({ ...form, thumbnail: e.target.value })
-              }
+              type="file"
+              accept="image/*"
+              onChange={(e) => setThumbnailFile(e.target.files[0])}
             />
 
             <Form.Control
               className="mb-2"
-              placeholder="File URL"
-              value={form.fileUrl}
-              onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
+              type="file"
+              onChange={(e) => setProductFile(e.target.files[0])}
             />
 
             <Form.Control
