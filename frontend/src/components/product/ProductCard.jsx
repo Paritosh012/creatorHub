@@ -6,14 +6,35 @@ const ProductCard = ({ product }) => {
 
   if (!product) return null;
 
-  const isFree = product.price === 0;
+  const {
+    slug,
+    title,
+    thumbnail,
+    price,
+    tags = [],
+    downloads,
+    creator,
+  } = product;
+
+  const isFree = price === 0;
   const isNew = product?.isNew;
+
+  const handleOpenProduct = () => {
+    navigate(`/product/${slug}`);
+  };
+
+  const handleOpenCreator = (e) => {
+    e.stopPropagation();
+    if (creator?._id) {
+      navigate(`/creator/${creator._id}`);
+    }
+  };
 
   return (
     <Card
       role="button"
-      aria-label={`Open product ${product.title}`}
-      onClick={() => navigate(`/product/${product.slug}`)}
+      aria-label={`Open product ${title}`}
+      onClick={handleOpenProduct}
       className="h-100"
       style={{
         background:
@@ -34,8 +55,8 @@ const ProductCard = ({ product }) => {
         }}
       >
         <img
-          src={product.thumbnail}
-          alt={product.title}
+          src={thumbnail}
+          alt={title}
           loading="lazy"
           style={{
             position: "absolute",
@@ -46,10 +67,8 @@ const ProductCard = ({ product }) => {
           }}
         />
 
-        {/* Badge */}
         {(isFree || isNew) && (
           <Badge
-            bg=""
             style={{
               position: "absolute",
               top: 10,
@@ -79,21 +98,17 @@ const ProductCard = ({ product }) => {
             lineHeight: 1.2,
           }}
         >
-          {product.title}
+          {title}
         </h6>
 
         <div
           style={{ color: "#9ca3af", fontSize: 13 }}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/creator/${product.creator._id}`);
-          }}
+          onClick={handleOpenCreator}
         >
-          by {product.creator.name}
+          by {creator?.name || "Unknown"}
         </div>
 
-        {/* Tags */}
-        {product.tags && product.tags.length > 0 && (
+        {tags.length > 0 && (
           <div
             style={{
               display: "flex",
@@ -102,7 +117,7 @@ const ProductCard = ({ product }) => {
               marginBottom: 10,
             }}
           >
-            {product.tags.slice(0, 3).map((tag, i) => (
+            {tags.slice(0, 3).map((tag, i) => (
               <span
                 key={i}
                 style={{
@@ -119,7 +134,6 @@ const ProductCard = ({ product }) => {
           </div>
         )}
 
-        {/* Price + downloads */}
         <div
           style={{
             display: "flex",
@@ -134,12 +148,12 @@ const ProductCard = ({ product }) => {
               fontSize: 14,
             }}
           >
-            {isFree ? "Free" : `₹${product.price}`}
+            {isFree ? "Free" : `₹${price}`}
           </div>
 
-          {product.downloads && (
+          {downloads > 0 && (
             <div style={{ color: "#9ca3af", fontSize: 12 }}>
-              {product.downloads} downloads
+              {downloads} downloads
             </div>
           )}
         </div>
