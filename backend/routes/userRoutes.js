@@ -1,7 +1,7 @@
 const express = require("express");
 const { becomeCreator } = require("../controllers/userController");
 const verifyToken = require("../middlewares/verifyToken");
-const { createProduct } = require("../controllers/productController");
+const { createProduct, getCreatorProfile } = require("../controllers/productController");
 
 const router = express.Router();
 
