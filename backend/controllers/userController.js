@@ -5,8 +5,8 @@ require("dotenv").config();
 
 const COOKIE_OPTIONS = {
   httpOnly: true,
-  secure: false,       // MUST be false on localhost
-  sameSite: "lax",     // MUST be lax on localhost
+  secure: true,       // MUST be false on localhost
+  sameSite: "none",     // MUST be lax on localhost
   maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
 };
 
