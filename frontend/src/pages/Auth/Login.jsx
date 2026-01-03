@@ -61,8 +61,9 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 style={{
+                  color: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff",
+                  background: "#fff",
                 }}
               />
             </Form.Group>
@@ -75,8 +76,9 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={{
+                  color: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
-                  color: "#fff",
+                  background: "#fff",
                 }}
               />
             </Form.Group>
