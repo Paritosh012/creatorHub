@@ -86,7 +86,7 @@ const ProductCard = ({ product }) => {
           style={{ color: "#9ca3af", fontSize: 13 }}
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/creator/${product.creator}`);
+            navigate(`/creator/${product.creator._id}`);
           }}
         >
           by {product.creator.name}
