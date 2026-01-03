@@ -67,7 +67,6 @@ const Register = () => {
                 onChange={(e) => setName(e.target.value)}
                 required
                 style={{
-                  background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   color: "#fff",
                 }}
@@ -82,7 +81,6 @@ const Register = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 style={{
-                  background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   color: "#fff",
                 }}
@@ -97,7 +95,6 @@ const Register = () => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 style={{
-                  background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
                   color: "#fff",
                 }}
