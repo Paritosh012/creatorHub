@@ -51,7 +51,12 @@ const Dashboard = () => {
 
   /* ---------------- CREATE ---------------- */
   const handleCreateProduct = async () => {
-    if (!form.title || !form.description.trim() || !thumbnailFile || !productFile) {
+    if (
+      !form.title ||
+      !form.description.trim() ||
+      !thumbnailFile ||
+      !productFile
+    ) {
       toast.error("All fields and files are required");
       return;
     }
@@ -66,8 +71,8 @@ const Dashboard = () => {
       fd.append("isFree", priceValue === 0);
       fd.append("category", form.category);
       fd.append("tags", form.category);
-      fd.append("thumbnail", thumbnailFile);
-      fd.append("file", productFile);
+      if (thumbnailFile) fd.append("thumbnail", thumbnailFile);
+      if (productFile) fd.append("file", productFile);
 
       const res = await api.post("/products/dashboard/create", fd, {
         headers: { "Content-Type": "multipart/form-data" },
@@ -176,7 +181,10 @@ const Dashboard = () => {
         {products.map((p) => (
           <Col md={4} key={p._id}>
             <Card className="bg-dark border-secondary">
-              <Card.Img src={p.thumbnail} style={{ height: 160, objectFit: "cover" }} />
+              <Card.Img
+                src={p.thumbnail}
+                style={{ height: 160, objectFit: "cover" }}
+              />
               <Card.Body>
                 <h6>{p.title}</h6>
                 <p style={{ color: "#9ca3af", fontSize: 13 }}>
@@ -203,7 +211,9 @@ const Dashboard = () => {
       {/* MODAL */}
       <Modal show={showModal} onHide={closeModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>{editingId ? "Edit Product" : "Upload Product"}</Modal.Title>
+          <Modal.Title>
+            {editingId ? "Edit Product" : "Upload Product"}
+          </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -250,7 +260,7 @@ const Dashboard = () => {
               type="file"
               accept="image/*"
               onChange={(e) => setThumbnailFile(e.target.files[0])}
-            /> 
+            />
 
             <Form.Control
               type="file"
@@ -263,7 +273,9 @@ const Dashboard = () => {
           <Button variant="secondary" onClick={closeModal}>
             Cancel
           </Button>
-          <Button onClick={editingId ? handleUpdateProduct : handleCreateProduct}>
+          <Button
+            onClick={editingId ? handleUpdateProduct : handleCreateProduct}
+          >
             {editingId ? "Update" : "Upload"}
           </Button>
         </Modal.Footer>

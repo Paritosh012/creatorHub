@@ -10,7 +10,16 @@ const {
 const verifyToken = require("../middlewares/verifyToken");
 const upload = require("../middlewares/upload");
 
-router.put("/:id", verifyToken, updateProduct);
+router.put(
+  "/:id",
+  verifyToken,
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "file", maxCount: 1 },
+  ]),
+  updateProduct
+);
+
 router.delete("/:id", verifyToken, deleteProduct);
 router.get("/creator", verifyToken, getCreatorProducts);
 router.get("/:slug", getProductBySlug);

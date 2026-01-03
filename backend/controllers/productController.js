@@ -73,7 +73,6 @@ const createProduct = async (req, res) => {
   }
 };
 
-
 const getCreatorProducts = async (req, res) => {
   try {
     const creatorId = req.user.id;
@@ -95,22 +94,55 @@ const getCreatorProducts = async (req, res) => {
 const updateProduct = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ success: false });
+    if (!product) {
+      return res.status(404).json({ success: false, msg: "Product not found" });
+    }
 
+    // ownership check
     if (product.creator.toString() !== req.user.id) {
-      return res.status(403).json({ success: false });
+      return res.status(403).json({ success: false, msg: "Unauthorized" });
     }
 
-    if (req.body.title && req.body.title !== product.title) {
-      product.slug = await generateUniqueSlug(req.body.title);
+    const { title, description, price, category, isFree, tags } = req.body;
+
+    // regenerate slug ONLY if title changed
+    if (title && title !== product.title) {
+      product.slug = await generateUniqueSlug(title);
+      product.title = title;
     }
 
-    Object.assign(product, req.body);
+    if (description) product.description = description;
+    if (price !== undefined) product.price = Number(price);
+    if (isFree !== undefined) product.isFree = isFree === "true";
+    if (category) product.category = category;
+    if (tags) product.tags = Array.isArray(tags) ? tags : [tags];
+
+    // 🔥 thumbnail replacement
+    if (req.files?.thumbnail) {
+      const thumbUpload = await uploadToCloudinary(
+        req.files.thumbnail[0].buffer,
+        "creatorhub/thumbnails",
+        "image"
+      );
+      product.thumbnail = thumbUpload.secure_url;
+    }
+
+    // 🔥 product file replacement
+    if (req.files?.file) {
+      const fileUpload = await uploadToCloudinary(
+        req.files.file[0].buffer,
+        "creatorhub/products",
+        "raw"
+      );
+      product.fileUrl = fileUpload.secure_url;
+    }
+
     await product.save();
 
     res.json({ success: true, product });
   } catch (err) {
-    res.status(400).json({ success: false });
+    console.error("Update product error:", err);
+    res.status(500).json({ success: false, msg: "Server error" });
   }
 };
 

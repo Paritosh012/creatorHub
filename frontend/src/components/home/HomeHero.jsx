@@ -48,7 +48,7 @@ const HomeHero = () => {
       fd.append("thumbnail", thumbnailFile);
       fd.append("file", productFile);
 
-      await api.post("/users/dashboard/create", fd, {
+      await api.post("/products/dashboard/create", fd, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
