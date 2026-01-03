@@ -1,6 +1,6 @@
 import "../../styles/Footer.css";
 import { Navbar, Nav, Container, Button } from "react-bootstrap";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
 import { toast } from "react-toastify";
@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 const SiteNavbar = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  let isLoggedIn = localStorage.getItem("user") ? true : false;
 
   /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
   useEffect(() => {
@@ -25,7 +26,7 @@ const SiteNavbar = () => {
     if (!user) {
       checkAuth();
     }
-  }, []);
+  }, [isLoggedIn]);
 
   /* ---------------- LOGOUT ---------------- */
   const handleLogout = async () => {
