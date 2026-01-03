@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const {
+  getAllProducts,
   getProductBySlug,
   getCreatorProducts,
   deleteProduct,
@@ -10,6 +11,24 @@ const {
 const verifyToken = require("../middlewares/verifyToken");
 const upload = require("../middlewares/upload");
 
+/* ✅ LIST PRODUCTS (FIRST) */
+router.get("/", getAllProducts);
+
+/* ✅ CREATOR PRODUCTS */
+router.get("/creator", verifyToken, getCreatorProducts);
+
+/* ✅ CREATE */
+router.post(
+  "/dashboard/create",
+  verifyToken,
+  upload.fields([
+    { name: "thumbnail", maxCount: 1 },
+    { name: "file", maxCount: 1 },
+  ]),
+  createProduct
+);
+
+/* ✅ UPDATE */
 router.put(
   "/:id",
   verifyToken,
@@ -20,18 +39,10 @@ router.put(
   updateProduct
 );
 
+/* ✅ DELETE */
 router.delete("/:id", verifyToken, deleteProduct);
-router.get("/creator", verifyToken, getCreatorProducts);
-router.get("/:slug", getProductBySlug);
 
-router.post(
-  "/dashboard/create",
-  verifyToken,
-  upload.fields([
-    { name: "thumbnail", maxCount: 1 },
-    { name: "file", maxCount: 1 },
-  ]),
-  createProduct
-);
+/* ✅ SINGLE PRODUCT (ALWAYS LAST) */
+router.get("/:slug", getProductBySlug);
 
 module.exports = router;
