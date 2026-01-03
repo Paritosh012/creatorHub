@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const userModel = require("../models/userModel");
+const productModel = require("../models/productModel");
 require("dotenv").config();
 
 const isProd = process.env.NODE_ENV === "production";
@@ -165,10 +166,49 @@ const logoutUser = (req, res) => {
     .json({ success: true, msg: "Logged out" });
 };
 
+const getCreatorProfile = async (req, res) => {
+  try {
+    const creator = await userModel.findById(req.params.id).select("name role");
+
+    if (!creator) {
+      return res.status(404).json({
+        success: false,
+        msg: "Creator not found",
+      });
+    }
+
+    if (creator.role !== "creator") {
+      return res.status(404).json({
+        success: false,
+        msg: "User is not a creator",
+      });
+    }
+
+    const products = await productModel.find({
+      creator: creator._id,
+      status: "published",
+    }).sort({ createdAt: -1 });
+
+    res.json({
+      success: true,
+      creator,
+      products,
+    });
+  } catch (err) {
+    console.error("Creator profile error:", err);
+    res.status(500).json({
+      success: false,
+      msg: "Server error",
+    });
+  }
+};
+
+
 module.exports = {
   registerUser,
   loginUser,
   me,
   becomeCreator,
   logoutUser,
+  getCreatorProfile,
 };

@@ -168,28 +168,6 @@ const deleteProduct = async (req, res) => {
   }
 };
 
-const getCreatorProfile = async (req, res) => {
-  try {
-    const creator = await User.findById(req.params.id).select("name role");
-    if (!creator || creator.role !== "creator") {
-      return res.status(404).json({ success: false, msg: "Creator not found" });
-    }
-
-    const products = await Product.find({
-      creator: creator._id,
-      status: "published",
-    }).sort({ createdAt: -1 });
-
-    res.json({
-      success: true,
-      creator,
-      products,
-    });
-  } catch (err) {
-    console.error("Creator profile error:", err);
-    res.status(500).json({ success: false });
-  }
-};
 
 module.exports = {
   getAllProducts,
@@ -197,6 +175,5 @@ module.exports = {
   createProduct,
   getCreatorProducts,
   updateProduct,
-  deleteProduct,
-  getCreatorProfile,
+  deleteProduct, 
 };
