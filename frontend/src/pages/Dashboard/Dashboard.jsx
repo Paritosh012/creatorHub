@@ -37,7 +37,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await api.get("/products/creator");
+        const res = await api.get("/products/creator/me");
         setProducts(res.data.products || []);
       } catch {
         toast.error("Failed to load products");

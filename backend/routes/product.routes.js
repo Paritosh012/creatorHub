@@ -4,6 +4,7 @@ const upload = require("../middlewares/upload");
 const c = require("../controllers/product.controller");
 
 router.get("/", c.getAll);
+router.get("/creator/me", verify, c.getByCreator);
 router.get("/:slug", c.getOne);
 
 router.post(
