@@ -13,7 +13,7 @@ const SiteNavbar = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await api.get("/auth/me", { withCredentials: true });
+        const res = await api.get("/users/me", { withCredentials: true });
         setUser(res.data.user);
       } catch {
         setUser(null);
