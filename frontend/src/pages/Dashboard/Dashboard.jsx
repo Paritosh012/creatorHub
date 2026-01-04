@@ -17,7 +17,9 @@ const Dashboard = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
+
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
 
@@ -31,23 +33,31 @@ const Dashboard = () => {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [productFile, setProductFile] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  /* ---------------- FETCH PRODUCTS ---------------- */
+  /* ---------------- AUTH + PRODUCTS ---------------- */
   useEffect(() => {
-    const fetchProducts = async () => {
+    const init = async () => {
       try {
-        const res = await api.get("/products/creator/me");
-        setProducts(res.data.products || []);
-      } catch {
-        toast.error("Failed to load products");
+        const meRes = await api.get("/auth/me");
+        setUser(meRes.data.user);
+
+        const prodRes = await api.get("/products/creator/me");
+        setProducts(prodRes.data.products || []);
+      } catch (err) {
+        if (err.response?.status === 401) {
+          navigate("/login");
+        } else if (err.response?.status === 403) {
+          toast.error("Not authorized as creator");
+          navigate("/");
+        } else {
+          toast.error("Failed to load dashboard");
+        }
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
-  }, []);
+    init();
+  }, [navigate]);
 
   /* ---------------- CREATE ---------------- */
   const handleCreateProduct = async () => {
@@ -71,14 +81,12 @@ const Dashboard = () => {
       fd.append("isFree", priceValue === 0);
       fd.append("category", form.category);
       fd.append("tags", form.category);
-      if (thumbnailFile) fd.append("thumbnail", thumbnailFile);
-      if (productFile) fd.append("file", productFile);
+      fd.append("thumbnail", thumbnailFile);
+      fd.append("file", productFile);
 
-      const res = await api.post("/products/dashboard/create", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.post("/products", fd);
 
-      toast.success("Product uploaded 🚀");
+      toast.success("Product uploaded");
       setProducts((prev) => [res.data.product, ...prev]);
       closeModal();
     } catch (err) {
@@ -87,7 +95,7 @@ const Dashboard = () => {
   };
 
   /* ---------------- EDIT ---------------- */
-  const handleEditOpen = (product) => {
+  const openEdit = (product) => {
     setEditingId(product._id);
     setForm({
       title: product.title,
@@ -115,9 +123,7 @@ const Dashboard = () => {
       if (thumbnailFile) fd.append("thumbnail", thumbnailFile);
       if (productFile) fd.append("file", productFile);
 
-      const res = await api.put(`/products/${editingId}`, fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await api.put(`/products/${editingId}`, fd);
 
       toast.success("Product updated");
       setProducts((prev) =>
@@ -130,7 +136,7 @@ const Dashboard = () => {
   };
 
   /* ---------------- DELETE ---------------- */
-  const handleDeleteProduct = async (id) => {
+  const handleDelete = async (id) => {
     if (!window.confirm("Delete this product permanently?")) return;
 
     try {
@@ -167,13 +173,13 @@ const Dashboard = () => {
   return (
     <Container style={{ paddingTop: 40 }}>
       <h2 style={{ color: "#fff", fontWeight: 800 }}>
-        Welcome, {user?.name || "Creator"}
+        Welcome, {user?.name}
       </h2>
 
       <div className="d-flex gap-2 mt-4">
-        <Button onClick={() => setShowModal(true)}>Add New Product</Button>
+        <Button onClick={() => setShowModal(true)}>Add Product</Button>
         <Button variant="outline-light" onClick={() => navigate("/explore")}>
-          Explore Marketplace
+          Explore
         </Button>
       </div>
 
@@ -191,13 +197,13 @@ const Dashboard = () => {
                   {p.price === 0 ? "Free" : `₹${p.price}`}
                 </p>
                 <div className="d-flex gap-2">
-                  <Button size="sm" onClick={() => handleEditOpen(p)}>
+                  <Button size="sm" onClick={() => openEdit(p)}>
                     Edit
                   </Button>
                   <Button
                     size="sm"
                     variant="outline-danger"
-                    onClick={() => handleDeleteProduct(p._id)}
+                    onClick={() => handleDelete(p._id)}
                   >
                     Delete
                   </Button>
@@ -222,21 +228,27 @@ const Dashboard = () => {
               className="mb-2"
               placeholder="Title"
               value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, title: e.target.value })
+              }
             />
 
             <Form.Control
               className="mb-2"
               type="number"
-              placeholder="Price (0 for free)"
+              placeholder="Price (0 = free)"
               value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, price: e.target.value })
+              }
             />
 
             <Form.Select
               className="mb-2"
               value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              onChange={(e) =>
+                setForm({ ...form, category: e.target.value })
+              }
             >
               <option value="ui-kits">UI Kits</option>
               <option value="templates">Templates</option>

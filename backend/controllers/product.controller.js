@@ -97,3 +97,25 @@ exports.remove = async (req, res) => {
   await product.deleteOne();
   res.json({ success: true });
 };
+
+exports.getByCreator = async (req, res) => {
+  try {
+    const creatorId = req.user.id;
+
+    const products = await Product.find({ creator: creatorId })
+      .sort({ createdAt: -1 })
+      .populate("creator", "name");
+
+    return res.status(200).json({
+      success: true,
+      products,
+    });
+  } catch (err) {
+    console.error("getByCreator error:", err);
+    return res.status(500).json({
+      success: false,
+      msg: "Server error",
+    });
+  }
+};
+
