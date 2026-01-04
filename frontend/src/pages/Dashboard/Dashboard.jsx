@@ -37,7 +37,7 @@ const Dashboard = () => {
   useEffect(() => {
     const init = async () => {
       try {
-        const meRes = await api.get("/auth/me");
+        const meRes = await api.get("/users/me");
         setUser(meRes.data.user);
 
         const prodRes = await api.get("/products/creator/me");
