@@ -1,14 +1,22 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Container } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const Success = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [show, setShow] = useState(false);
 
+  // CHANGE: guard direct access
   useEffect(() => {
-    setTimeout(() => setShow(true), 200);
-  }, []);
+    if (!location.state?.fromCheckout) {
+      navigate("/explore");
+      return;
+    }
+
+    const t = setTimeout(() => setShow(true), 200);
+    return () => clearTimeout(t); // CHANGE: cleanup
+  }, [location.state, navigate]);
 
   return (
     <Container className="d-flex justify-content-center align-items-center py-5">
@@ -26,14 +34,7 @@ const Success = () => {
         }}
       >
         <Card.Body style={{ padding: "32px 26px" }}>
-          <div
-            style={{
-              fontSize: 56,
-              marginBottom: 12,
-            }}
-          >
-            ✅
-          </div>
+          <div style={{ fontSize: 56, marginBottom: 12 }}>✅</div>
 
           <h2
             style={{

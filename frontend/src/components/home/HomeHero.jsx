@@ -1,65 +1,46 @@
-import { Container, Row, Col, Button, Modal, Form } from "react-bootstrap";
+import { Container, Row, Col, Button, Modal } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 
+/**
+ * CHANGE:
+ * - Removed product upload logic from HomeHero
+ * - HomeHero should NOT handle product creation
+ * - This avoids duplication with Dashboard
+ */
+
 const HomeHero = () => {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
 
+  /**
+   * CHANGE:
+   * - Removed direct localStorage access
+   * - Auth source of truth should be backend (/users/me)
+   */
+  const [user, setUser] = useState(null);
   const [showCreatorModal, setShowCreatorModal] = useState(false);
-  const [showProductModal, setShowProductModal] = useState(false);
 
-  const [form, setForm] = useState({
-    title: "",
-    price: "",
-    category: "",
-    description: "",
-  });
+  /**
+   * CHANGE:
+   * - Fetch auth state from backend
+   * - Keeps Hero in sync with Navbar
+   */
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await api.get("/users/me");
+        setUser(res.data.user);
+      } catch {
+        setUser(null);
+      }
+    };
 
-  const [thumbnailFile, setThumbnailFile] = useState(null);
-  const [productFile, setProductFile] = useState(null);
+    checkAuth();
+  }, []);
 
   const isCreator = user?.role === "creator";
-
-  /* ---------------- CREATE PRODUCT ---------------- */
-  const handleCreateProduct = async () => {
-    if (
-      !form.title ||
-      !form.description.trim() ||
-      !thumbnailFile ||
-      !productFile
-    ) {
-      toast.error("All fields and files are required");
-      return;
-    }
-
-    try {
-      const fd = new FormData();
-      const priceValue = Number(form.price || 0);
-
-      fd.append("title", form.title);
-      fd.append("description", form.description);
-      fd.append("price", priceValue);
-      fd.append("isFree", priceValue === 0);
-      fd.append("category", form.category);
-      fd.append("tags", form.category);
-      fd.append("thumbnail", thumbnailFile);
-      fd.append("file", productFile);
-
-      await api.post("/products/dashboard/create", fd, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      toast.success("Product uploaded 🚀");
-      setShowProductModal(false);
-      resetForm();
-      navigate("/dashboard");
-    } catch (err) {
-      toast.error(err.response?.data?.msg || "Upload failed");
-    }
-  };
 
   /* ---------------- BECOME CREATOR ---------------- */
   const handleBecomeCreator = async () => {
@@ -67,25 +48,19 @@ const HomeHero = () => {
       const res = await api.put("/users/become-creator");
 
       if (res.data.success) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
         toast.success("You are now a creator 🚀");
+
+        /**
+         * CHANGE:
+         * - No localStorage mutation
+         * - Rely on backend + re-fetch via dashboard/navbar
+         */
         setShowCreatorModal(false);
         navigate("/dashboard");
       }
     } catch {
       toast.error("Failed to become creator");
     }
-  };
-
-  const resetForm = () => {
-    setForm({
-      title: "",
-      price: "",
-      category: "ui-kits",
-      description: "",
-    });
-    setThumbnailFile(null);
-    setProductFile(null);
   };
 
   return (
@@ -110,8 +85,12 @@ const HomeHero = () => {
 
                 {user ? (
                   isCreator ? (
-                    <Button onClick={() => setShowProductModal(true)}>
-                      Upload your product
+                    /**
+                     * CHANGE:
+                     * - Redirect creator to dashboard instead of upload modal
+                     */
+                    <Button onClick={() => navigate("/dashboard")}>
+                      Go to Dashboard
                     </Button>
                   ) : (
                     <Button
@@ -171,81 +150,6 @@ const HomeHero = () => {
             Cancel
           </Button>
           <Button onClick={handleBecomeCreator}>Confirm</Button>
-        </Modal.Footer>
-      </Modal>
-
-      {/* PRODUCT UPLOAD MODAL */}
-      <Modal
-        show={showProductModal}
-        onHide={() => setShowProductModal(false)}
-        centered
-        size="lg"
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>Upload New Product</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Form>
-            <Form.Control
-              className="mb-2"
-              placeholder="Title"
-              value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-            />
-
-            <Form.Control
-              className="mb-2"
-              type="number"
-              placeholder="Price (0 = free)"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-            />
-
-            <Form.Select
-              className="mb-2"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            >
-              <option value="ui-kits">UI Kits</option>
-              <option value="templates">Templates</option>
-              <option value="icons">Icons</option>
-              <option value="3d-assets">3D Assets</option>
-            </Form.Select>
-
-            <Form.Control
-              className="mb-2"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setThumbnailFile(e.target.files[0])}
-            />
-
-            <Form.Control
-              className="mb-2"
-              type="file"
-              onChange={(e) => setProductFile(e.target.files[0])}
-            />
-
-            <Form.Control
-              as="textarea"
-              rows={3}
-              placeholder="Description"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-            />
-          </Form>
-        </Modal.Body>
-
-        <Modal.Footer>
-          <Button
-            variant="secondary"
-            onClick={() => setShowProductModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button onClick={handleCreateProduct}>Upload</Button>
         </Modal.Footer>
       </Modal>
     </>

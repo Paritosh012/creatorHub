@@ -11,8 +11,8 @@ import ProductDetails from "./components/product/ProductsDetails";
 import Checkout from "./pages/Checkout/Checkout";
 import Success from "./pages/Checkout/Success";
 import Admin from "./pages/Admin/Admin";
-import Dashboard from "./pages/Dashboard/Dashboard";
-import CreatorProfile from "./pages/CreatorProfile";
+import Dashboard from "./pages/Dashboard/Dashboard"; 
+import CreatorProfile from "./pages/Creator/CreatorProfile";
 
 const App = () => {
   return (
@@ -30,7 +30,7 @@ const App = () => {
           <Route path="success" element={<Success />} />
           <Route path="admin" element={<Admin />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="creator/:id" element={<CreatorProfile />} />
+          <Route path="creator/:id" element={<CreatorProfile/>} />
         </Route>
 
         {/* 404 */}

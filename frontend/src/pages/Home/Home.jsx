@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import HomeHero from "../../components/home/HomeHero";
 import PopularProducts from "../../components/home/PopularProducts";
 import axios from "axios";

@@ -1,8 +1,10 @@
-import { useEffect, useState } from "react";
-import { Container, Row, Col, Form, Button, Spinner } from "react-bootstrap";
-import ProductCard from "../../components/product/ProductCard";
-import { getAllProducts } from "../../services/productApi";
+import { useEffect, useState, useMemo } from "react";
+import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import { useSearchParams } from "react-router-dom";
+import { getAllProducts } from "../../services/productApi";
+import ProductCard from "../../components/product/ProductCard";
+import SkeletonCard from "../../components/common/SkeletonCard";
+import { toast } from "react-toastify";
 
 const categoryOptions = [
   { label: "All", value: null },
@@ -15,67 +17,65 @@ const categoryOptions = [
 
 const Explore = () => {
   const [allProducts, setAllProducts] = useState([]);
-  const [products, setProducts] = useState([]);
   const [query, setQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategory = searchParams.get("category");
 
+  /* ---------------- FETCH WITH TIMEOUT ---------------- */
   useEffect(() => {
-    const fetchAll = async () => {
-      setLoading(true);
+    let didFinish = false;
+    const timeoutId = setTimeout(() => {
+      if (!didFinish) {
+        setLoading(false);
+        setError("Request timed out. Please try again.");
+      }
+    }, 8000);
+
+    const fetchProducts = async () => {
       try {
         const res = await getAllProducts();
-        setAllProducts(res.data.products);
-        setProducts(res.data.products);
-      } catch (err) {
-        console.error("Explore fetch failed:", err);
+        if (!didFinish) {
+          setAllProducts(res.data.products || []);
+        }
+      } catch {
+        if (!didFinish) {
+          setError("Failed to load products");
+          toast.error("Failed to load products");
+        }
       } finally {
-        setLoading(false);
+        if (!didFinish) setLoading(false);
       }
     };
 
-    fetchAll();
+    fetchProducts();
+
+    return () => {
+      didFinish = true;
+      clearTimeout(timeoutId);
+    };
   }, []);
 
-  useEffect(() => {
-    if (!selectedCategory) {
-      setProducts(allProducts);
-      return;
+  /* ---------------- DERIVED PRODUCTS ---------------- */
+  const products = useMemo(() => {
+    let list = allProducts;
+
+    if (selectedCategory) {
+      list = list.filter((p) => p.category === selectedCategory);
     }
 
-    const filtered = allProducts.filter(
-      (p) => p.category === selectedCategory
-    );
-    setProducts(filtered);
-  }, [selectedCategory, allProducts]);
-
-  const handleSearch = () => {
-    if (!query.trim()) {
-      setProducts(allProducts);
-      return;
+    if (query.trim()) {
+      const q = query.toLowerCase();
+      list = list.filter((p) => p.title.toLowerCase().includes(q));
     }
 
-    const filtered = allProducts.filter((p) =>
-      p.title.toLowerCase().includes(query.toLowerCase())
-    );
-
-    setProducts(filtered);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleSearch();
-    }
-  };
+    return list;
+  }, [allProducts, selectedCategory, query]);
 
   const handleCategoryChange = (value) => {
-    if (!value) {
-      setSearchParams({});
-    } else {
-      setSearchParams({ category: value });
-    }
+    value ? setSearchParams({ category: value }) : setSearchParams({});
   };
 
   return (
@@ -87,7 +87,6 @@ const Explore = () => {
             placeholder="Search assets..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={handleKeyPress}
             style={{
               background: "rgba(255,255,255,0.03)",
               border: "1px solid rgba(255,255,255,0.06)",
@@ -98,7 +97,7 @@ const Explore = () => {
           <Button
             variant="outline-light"
             style={{ borderRadius: 10, minWidth: 110 }}
-            onClick={handleSearch}
+            onClick={() => {}}
           >
             Search
           </Button>
@@ -116,10 +115,7 @@ const Explore = () => {
                 key={cat.label}
                 size="sm"
                 variant={active ? "light" : "outline-light"}
-                style={{
-                  borderRadius: 20,
-                  fontWeight: active ? 700 : 500,
-                }}
+                style={{ borderRadius: 20, fontWeight: active ? 700 : 500 }}
                 onClick={() => handleCategoryChange(cat.value)}
               >
                 {cat.label}
@@ -130,25 +126,27 @@ const Explore = () => {
 
         {/* CONTENT */}
         {loading ? (
-          <div className="d-flex justify-content-center py-5">
-            <Spinner animation="border" variant="light" />
+          <Row className="g-3 g-md-4">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <Col key={i} xs={12} sm={6} md={4} lg={3}>
+                <SkeletonCard />
+              </Col>
+            ))}
+          </Row>
+        ) : error ? (
+          <div style={{ color: "#9ca3af", marginTop: 60, textAlign: "center" }}>
+            {error}
           </div>
         ) : products.length > 0 ? (
           <Row className="g-3 g-md-4">
             {products.map((item) => (
-              <Col key={item.id} xs={12} sm={6} md={4} lg={3}>
+              <Col key={item._id} xs={12} sm={6} md={4} lg={3}>
                 <ProductCard product={item} />
               </Col>
             ))}
           </Row>
         ) : (
-          <div
-            style={{
-              color: "#9ca3af",
-              marginTop: 60,
-              textAlign: "center",
-            }}
-          >
+          <div style={{ color: "#9ca3af", marginTop: 60, textAlign: "center" }}>
             No results found.
           </div>
         )}

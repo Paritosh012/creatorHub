@@ -1,10 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { Card, Badge } from "react-bootstrap";
 
+/**
+ * ProductCard
+ * Canonical product card used across the app
+ */
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
 
-  if (!product) return null;
+  /**
+   * CHANGE:
+   * - Defensive guard
+   * - Prevents runtime errors if product is malformed
+   */
+  if (!product || !product.slug) return null;
 
   const {
     slug,
@@ -12,19 +21,34 @@ const ProductCard = ({ product }) => {
     thumbnail,
     price,
     tags = [],
-    downloads,
+    downloads = 0,
     creator,
+    isNew,
   } = product;
 
   const isFree = price === 0;
-  const isNew = product?.isNew;
 
   const handleOpenProduct = () => {
     navigate(`/product/${slug}`);
   };
 
+  const handleKeyDown = (e) => {
+    /**
+     * CHANGE:
+     * - Keyboard accessibility for card
+     */
+    if (e.key === "Enter") {
+      handleOpenProduct();
+    }
+  };
+
   const handleOpenCreator = (e) => {
     e.stopPropagation();
+
+    /**
+     * CHANGE:
+     * - Defensive guard
+     */
     if (creator?._id) {
       navigate(`/creator/${creator._id}`);
     }
@@ -33,8 +57,10 @@ const ProductCard = ({ product }) => {
   return (
     <Card
       role="button"
+      tabIndex={0} // CHANGE: keyboard focusable
       aria-label={`Open product ${title}`}
       onClick={handleOpenProduct}
+      onKeyDown={handleKeyDown}
       className="h-100"
       style={{
         background:
@@ -55,7 +81,14 @@ const ProductCard = ({ product }) => {
         }}
       >
         <img
-          src={thumbnail}
+          /**
+           * CHANGE:
+           * - Added fallback image
+           */
+          src={
+            thumbnail ||
+            "https://picsum.photos/seed/placeholder/800/600"
+          }
           alt={title}
           loading="lazy"
           style={{
@@ -117,9 +150,13 @@ const ProductCard = ({ product }) => {
               marginBottom: 10,
             }}
           >
-            {tags.slice(0, 3).map((tag, i) => (
+            {tags.slice(0, 3).map((tag) => (
+              /**
+               * CHANGE:
+               * - Use tag value as key (stable)
+               */
               <span
-                key={i}
+                key={tag}
                 style={{
                   background: "rgba(255,255,255,0.04)",
                   borderRadius: 6,
@@ -151,11 +188,12 @@ const ProductCard = ({ product }) => {
             {isFree ? "Free" : `₹${price}`}
           </div>
 
-          {downloads > 0 && (
-            <div style={{ color: "#9ca3af", fontSize: 12 }}>
-              {downloads} downloads
-            </div>
-          )}
+          {/* CHANGE:
+              - Show 0 downloads explicitly
+          */}
+          <div style={{ color: "#9ca3af", fontSize: 12 }}>
+            {downloads} downloads
+          </div>
         </div>
       </Card.Body>
     </Card>

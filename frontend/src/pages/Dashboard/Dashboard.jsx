@@ -6,22 +6,25 @@ import {
   Col,
   Card,
   Button,
-  Spinner,
   Modal,
   Form,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import SkeletonCard from "../../components/common/SkeletonCard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  const [loading, setLoading] = useState(true);
+  // PAGE STATE
+  const [pageLoading, setPageLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
 
+  // MODAL STATE
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [actionLoading, setActionLoading] = useState(false); // CHANGE
 
   const [form, setForm] = useState({
     title: "",
@@ -38,6 +41,8 @@ const Dashboard = () => {
     const init = async () => {
       try {
         const meRes = await api.get("/users/me");
+        if (!meRes.data?.user) throw new Error("No user");
+
         setUser(meRes.data.user);
 
         const prodRes = await api.get("/products/creator/me");
@@ -52,7 +57,7 @@ const Dashboard = () => {
           toast.error("Failed to load dashboard");
         }
       } finally {
-        setLoading(false);
+        setPageLoading(false);
       }
     };
 
@@ -61,6 +66,8 @@ const Dashboard = () => {
 
   /* ---------------- CREATE ---------------- */
   const handleCreateProduct = async () => {
+    if (actionLoading) return;
+
     if (
       !form.title ||
       !form.description.trim() ||
@@ -72,6 +79,8 @@ const Dashboard = () => {
     }
 
     try {
+      setActionLoading(true);
+
       const fd = new FormData();
       const priceValue = Number(form.price || 0);
 
@@ -86,11 +95,13 @@ const Dashboard = () => {
 
       const res = await api.post("/products", fd);
 
-      toast.success("Product uploaded");
       setProducts((prev) => [res.data.product, ...prev]);
+      toast.success("Product uploaded");
       closeModal();
     } catch (err) {
       toast.error(err.response?.data?.msg || "Upload failed");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -109,7 +120,11 @@ const Dashboard = () => {
   };
 
   const handleUpdateProduct = async () => {
+    if (actionLoading) return;
+
     try {
+      setActionLoading(true);
+
       const fd = new FormData();
       const priceValue = Number(form.price || 0);
 
@@ -125,26 +140,32 @@ const Dashboard = () => {
 
       const res = await api.put(`/products/${editingId}`, fd);
 
-      toast.success("Product updated");
       setProducts((prev) =>
         prev.map((p) => (p._id === editingId ? res.data.product : p))
       );
+      toast.success("Product updated");
       closeModal();
     } catch {
       toast.error("Update failed");
+    } finally {
+      setActionLoading(false);
     }
   };
 
   /* ---------------- DELETE ---------------- */
   const handleDelete = async (id) => {
+    if (actionLoading) return;
     if (!window.confirm("Delete this product permanently?")) return;
 
     try {
+      setActionLoading(true);
       await api.delete(`/products/${id}`);
-      toast.success("Product deleted");
       setProducts((prev) => prev.filter((p) => p._id !== id));
+      toast.success("Product deleted");
     } catch {
       toast.error("Delete failed");
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -160,21 +181,26 @@ const Dashboard = () => {
     });
     setThumbnailFile(null);
     setProductFile(null);
+    setActionLoading(false);
   };
 
-  if (loading) {
+  if (pageLoading) {
     return (
-      <div className="d-flex justify-content-center mt-5">
-        <Spinner />
-      </div>
+      <Container style={{ paddingTop: 40 }}>
+        <Row className="g-4 mt-4">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Col md={4} key={i}>
+              <SkeletonCard />
+            </Col>
+          ))}
+        </Row>
+      </Container>
     );
   }
 
   return (
     <Container style={{ paddingTop: 40 }}>
-      <h2 style={{ color: "#fff", fontWeight: 800 }}>
-        Welcome, {user?.name}
-      </h2>
+      <h2 style={{ color: "#fff", fontWeight: 800 }}>Welcome, {user?.name}</h2>
 
       <div className="d-flex gap-2 mt-4">
         <Button onClick={() => setShowModal(true)}>Add Product</Button>
@@ -183,36 +209,42 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <Row className="g-4 mt-4">
-        {products.map((p) => (
-          <Col md={4} key={p._id}>
-            <Card className="bg-dark border-secondary">
-              <Card.Img
-                src={p.thumbnail}
-                style={{ height: 160, objectFit: "cover" }}
-              />
-              <Card.Body>
-                <h6>{p.title}</h6>
-                <p style={{ color: "#9ca3af", fontSize: 13 }}>
-                  {p.price === 0 ? "Free" : `₹${p.price}`}
-                </p>
-                <div className="d-flex gap-2">
-                  <Button size="sm" onClick={() => openEdit(p)}>
-                    Edit
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="outline-danger"
-                    onClick={() => handleDelete(p._id)}
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        ))}
-      </Row>
+      {products.length === 0 ? (
+        <p style={{ color: "#9ca3af", marginTop: 24 }}>
+          You haven’t uploaded any products yet.
+        </p>
+      ) : (
+        <Row className="g-4 mt-4">
+          {products.map((p) => (
+            <Col md={4} key={p._id}>
+              <Card className="bg-dark border-secondary">
+                <Card.Img
+                  src={p.thumbnail}
+                  style={{ height: 160, objectFit: "cover" }}
+                />
+                <Card.Body>
+                  <h6>{p.title}</h6>
+                  <p style={{ color: "#9ca3af", fontSize: 13 }}>
+                    {p.price === 0 ? "Free" : `₹${p.price}`}
+                  </p>
+                  <div className="d-flex gap-2">
+                    <Button size="sm" onClick={() => openEdit(p)}>
+                      Edit
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline-danger"
+                      onClick={() => handleDelete(p._id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          ))}
+        </Row>
+      )}
 
       {/* MODAL */}
       <Modal show={showModal} onHide={closeModal} centered>
@@ -228,9 +260,8 @@ const Dashboard = () => {
               className="mb-2"
               placeholder="Title"
               value={form.title}
-              onChange={(e) =>
-                setForm({ ...form, title: e.target.value })
-              }
+              disabled={actionLoading}
+              onChange={(e) => setForm({ ...form, title: e.target.value })}
             />
 
             <Form.Control
@@ -238,17 +269,15 @@ const Dashboard = () => {
               type="number"
               placeholder="Price (0 = free)"
               value={form.price}
-              onChange={(e) =>
-                setForm({ ...form, price: e.target.value })
-              }
+              disabled={actionLoading}
+              onChange={(e) => setForm({ ...form, price: e.target.value })}
             />
 
             <Form.Select
               className="mb-2"
               value={form.category}
-              onChange={(e) =>
-                setForm({ ...form, category: e.target.value })
-              }
+              disabled={actionLoading}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
             >
               <option value="ui-kits">UI Kits</option>
               <option value="templates">Templates</option>
@@ -262,6 +291,7 @@ const Dashboard = () => {
               rows={3}
               placeholder="Description"
               value={form.description}
+              disabled={actionLoading}
               onChange={(e) =>
                 setForm({ ...form, description: e.target.value })
               }
@@ -271,11 +301,13 @@ const Dashboard = () => {
               className="mb-2"
               type="file"
               accept="image/*"
+              disabled={actionLoading}
               onChange={(e) => setThumbnailFile(e.target.files[0])}
             />
 
             <Form.Control
               type="file"
+              disabled={actionLoading}
               onChange={(e) => setProductFile(e.target.files[0])}
             />
           </Form>
@@ -286,9 +318,10 @@ const Dashboard = () => {
             Cancel
           </Button>
           <Button
+            disabled={actionLoading}
             onClick={editingId ? handleUpdateProduct : handleCreateProduct}
           >
-            {editingId ? "Update" : "Upload"}
+            {actionLoading ? "Processing..." : editingId ? "Update" : "Upload"}
           </Button>
         </Modal.Footer>
       </Modal>

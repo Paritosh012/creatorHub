@@ -1,59 +1,47 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { getPopularProducts } from "../../services/productApi";
+import ProductCard from "../../components/product/ProductCard";
 
-const productsList = [
-  {
-    id: 1,
-    title: "Minimal UI Kit",
-    creator: "Asha",
-    price: 499,
-    thumbnail: "https://picsum.photos/seed/p1/500/400",
-  },
-  {
-    id: 2,
-    title: "3D Icons Pack",
-    creator: "Ravi",
-    price: 299,
-    thumbnail: "https://picsum.photos/seed/p2/500/400",
-  },
-  {
-    id: 3,
-    title: "Dashboard Template",
-    creator: "Maya",
-    price: 0,
-    thumbnail: "https://picsum.photos/seed/p3/500/400",
-  },
-  {
-    id: 4,
-    title: "Figma Wireframe Kit",
-    creator: "Dev",
-    price: 199,
-    thumbnail: "https://picsum.photos/seed/p4/500/400",
-  },
-];
+/**
+ * CHANGE:
+ * - Removed mock `productsList`
+ * - Fake data hides real API problems
+ * - EmptyState should be shown instead
+ */
 
 const PopularProducts = () => {
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        let res = await getPopularProducts();
-        setProducts(res.data.products);
+        const res = await getPopularProducts();
+
+        /**
+         * CHANGE:
+         * - Defensive check
+         * - Prevents crashes if backend response changes
+         */
+        setProducts(Array.isArray(res.data.products) ? res.data.products : []);
       } catch {
-        setProducts(productsList);
+        /**
+         * CHANGE:
+         * - Do NOT silently fake data
+         * - Show empty/error state instead
+         */
+        setError(true);
+        setProducts([]);
       }
     };
+
     fetchProducts();
   }, []);
 
   return (
-    <section
-      aria-label="Popular assets"
-      className="py-4 py-md-5"
-    >
+    <section aria-label="Popular assets" className="py-4 py-md-5">
       <Container>
         {/* Header */}
         <Row className="align-items-start align-items-md-center mb-3">
@@ -73,11 +61,7 @@ const PopularProducts = () => {
             </p>
           </Col>
 
-          <Col
-            xs={12}
-            md="auto"
-            className="mt-2 mt-md-0"
-          >
+          <Col xs={12} md="auto" className="mt-2 mt-md-0">
             <Link
               to="/explore"
               style={{
@@ -92,12 +76,17 @@ const PopularProducts = () => {
           </Col>
         </Row>
 
-        {!products || products.length === 0 ? (
-          <EmptyState />
+        {products.length === 0 ? (
+          <EmptyState isError={error} />
         ) : (
           <Row className="g-3 g-md-4">
             {products.map((p) => (
-              <Col key={p.id} xs={12} sm={6} lg={3}>
+              /**
+               * CHANGE:
+               * - Use `_id` as key
+               * - ProductCard handles routing via `slug`
+               */
+              <Col key={p._id} xs={12} sm={6} lg={3}>
                 <ProductCard product={p} />
               </Col>
             ))}
@@ -108,69 +97,7 @@ const PopularProducts = () => {
   );
 };
 
-const ProductCard = ({ product }) => {
-  const { id, title, creator, price, thumbnail } = product;
-
-  return (
-    <Card
-      as={Link}
-      to={`/product/${id}`}
-      aria-label={`Open product ${title}`}
-      className="h-100 card-glass text-decoration-none"
-      style={{
-        overflow: "hidden",
-        transition: "transform 0.15s ease, border-color 0.15s ease",
-      }}
-    >
-      {/* Image */}
-      <div
-        style={{
-          position: "relative",
-          paddingTop: "62%",
-          background: "rgba(255,255,255,0.02)",
-        }}
-      >
-        <img
-          src={thumbnail || `https://picsum.photos/seed/p-${id}/800/560`}
-          alt={title}
-          loading="lazy"
-          style={{
-            position: "absolute",
-            inset: 0,
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-          }}
-        />
-      </div>
-
-      <Card.Body style={{ padding: "14px 14px 16px" }}>
-        <Card.Title
-          style={{
-            color: "#fff",
-            fontSize: 15,
-            fontWeight: 700,
-            marginBottom: 6,
-            lineHeight: 1.2,
-          }}
-        >
-          {title}
-        </Card.Title>
-
-        <div className="d-flex justify-content-between align-items-center">
-          <div style={{ color: "var(--muted)", fontSize: 13 }}>
-            {creator}
-          </div>
-          <div style={{ color: "#fff", fontWeight: 800, fontSize: 14 }}>
-            {price === 0 ? "Free" : `₹${price}`}
-          </div>
-        </div>
-      </Card.Body>
-    </Card>
-  );
-};
-
-const EmptyState = () => (
+const EmptyState = ({ isError }) => (
   <div
     role="status"
     style={{
@@ -191,10 +118,12 @@ const EmptyState = () => (
         marginBottom: 6,
       }}
     >
-      No products found
+      {isError ? "Failed to load products" : "No products found"}
     </div>
     <div style={{ fontSize: 14 }}>
-      We couldn't load popular assets right now — try again later.
+      {isError
+        ? "Please try again later."
+        : "No trending assets available right now."}
     </div>
   </div>
 );

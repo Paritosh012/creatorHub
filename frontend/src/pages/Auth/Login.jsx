@@ -1,31 +1,53 @@
-import { useState } from "react";
-import { Container, Form, Button, Card } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Container, Form, Button, Card, Spinner } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // CHANGE: redirect if already logged in
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    if (user) navigate("/");
+  }, [navigate]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      toast.error("Email and password required");
+      return;
+    }
+
     try {
-      const res = await api.post("/auth/login", {
-        email,
-        password,
-      });
+      setLoading(true);
+
+      const res = await api.post("/auth/login", { email, password });
 
       if (res.data.success) {
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        toast.success("Login successful 🎉");
-        setTimeout(() => {
-          navigate("/");
-        }, 1500);
+        // CHANGE: keep localStorage minimal
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: res.data.user._id,
+            role: res.data.user.role,
+            name: res.data.user.name,
+          })
+        );
+
+        toast.success("Login successful");
+        navigate("/"); // CHANGE: no artificial delay
       }
     } catch (err) {
-      toast.error(err.response?.data?.msg || "Login failed ❌");
+      toast.error(err.response?.data?.msg || "Login failed");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,6 +82,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={loading}
                 style={{
                   background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -75,6 +98,7 @@ const Login = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={loading}
                 style={{
                   background: "rgba(255,255,255,0.06)",
                   border: "1px solid rgba(255,255,255,0.1)",
@@ -87,13 +111,14 @@ const Login = () => {
               type="submit"
               variant="light"
               className="w-100"
+              disabled={loading}
               style={{
                 fontWeight: 700,
                 padding: "10px 0",
                 borderRadius: 10,
               }}
             >
-              Login
+              {loading ? <Spinner size="sm" /> : "Login"}
             </Button>
           </Form>
 

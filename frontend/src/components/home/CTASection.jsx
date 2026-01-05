@@ -1,20 +1,32 @@
-import React from "react";
 import { Container, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+
+/**
+ * CHANGE:
+ * - Removed `import React from "react"`
+ *   (not required in modern React setups)
+ */
+
+/**
+ * CHANGE:
+ * - Extracted container style to avoid recreation on each render
+ * - Makes future theming easier
+ */
+const containerStyle = {
+  background:
+    "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006))",
+  border: "1px solid rgba(255,255,255,0.06)",
+  borderRadius: 16,
+  padding: "28px 20px",
+  textAlign: "center",
+  transition: "border-color 0.2s ease",
+};
 
 const CTASection = () => {
   return (
     <section className="py-4 py-md-5">
       <Container
-        style={{
-          background:
-            "linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.006))",
-          border: "1px solid rgba(255,255,255,0.06)",
-          borderRadius: 16,
-          padding: "28px 20px",
-          textAlign: "center",
-          transition: "border-color 0.2s ease",
-        }}
+        style={containerStyle}
         className="px-sm-4 py-sm-4 px-md-5 py-md-4"
       >
         <h2
@@ -24,7 +36,6 @@ const CTASection = () => {
             marginBottom: 10,
             fontSize: 22,
           }}
-          className="fs-md-2"
         >
           Join CreatorHub today
         </h2>
@@ -58,9 +69,14 @@ const CTASection = () => {
             Explore Assets
           </Button>
 
+          {/* 
+            CHANGE:
+            - Fixed broken route
+            - `/dashboard` is the actual entry point for creator flow
+          */}
           <Button
             as={Link}
-            to="/become-a-creator"
+            to="/dashboard"
             variant="outline-light"
             className="fw-semibold"
             style={{

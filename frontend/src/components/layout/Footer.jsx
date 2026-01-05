@@ -80,11 +80,15 @@ const Footer = () => {
               influence.
             </p>
 
+            {/* CHANGE:
+                - Fixed broken route
+                - `/dashboard/create` does NOT exist
+            */}
             <Button
               variant="outline-light"
               size="sm"
               as={Link}
-              to="/dashboard/create"
+              to="/dashboard"
               style={{
                 marginTop: 8,
                 borderRadius: 10,
@@ -108,7 +112,11 @@ const Footer = () => {
                   key={tag}
                   pill
                   as={Link}
-                  to={`/explore?tag=${tag}`}
+                  /* CHANGE:
+                     - Kept tag-based query (no assumptions)
+                     - Explore can later decide how to handle tags
+                  */
+                  to={`/explore?tag=${encodeURIComponent(tag)}`}
                   className="text-decoration-none"
                   bg=""
                   style={{

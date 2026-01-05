@@ -4,34 +4,43 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const Checkout = () => {
-  const { state } = useLocation();
+  const location = useLocation();
   const navigate = useNavigate();
   const [processing, setProcessing] = useState(false);
 
-  if (!state)
+  // CHANGE: defensive extraction
+  const product = location.state;
+
+  if (!product || !product.title) {
     return (
       <Container className="py-5 text-center">
         <p style={{ color: "#9ca3af" }}>No product selected.</p>
-        <Button
-          variant="outline-light"
-          onClick={() => navigate("/explore")}
-        >
+        <Button variant="outline-light" onClick={() => navigate("/explore")}>
           Back to Explore
         </Button>
       </Container>
     );
+  }
+
+  const isFree = product.price === 0;
 
   const handlePayment = () => {
+    if (processing) return; // CHANGE: double-click guard
+
     setProcessing(true);
 
+    // CHANGE: single controlled timeout
     setTimeout(() => {
       setProcessing(false);
-      toast.success("Payment successful 🎉");
 
-      setTimeout(() => {
-        navigate("/success");
-      }, 1500);
-    }, 2000);
+      toast.success(
+        isFree ? "Download ready 🎉" : "Payment successful 🎉"
+      );
+
+      navigate("/success", {
+        state: { fromCheckout: true }, // CHANGE: pass guard flag
+      });
+    }, 1800);
   };
 
   return (
@@ -65,10 +74,10 @@ const Checkout = () => {
             }}
           >
             <h5 style={{ color: "#fff", marginBottom: 4 }}>
-              {state.title}
+              {product.title}
             </h5>
             <div style={{ color: "#9ca3af", fontSize: 14 }}>
-              {state.category}
+              {product.category}
             </div>
           </div>
 
@@ -81,10 +90,10 @@ const Checkout = () => {
               style={{
                 fontSize: 26,
                 fontWeight: 800,
-                color: state.price === 0 ? "#06b6d4" : "#e6eef2",
+                color: isFree ? "#06b6d4" : "#e6eef2",
               }}
             >
-              {state.price === 0 ? "Free" : `₹${state.price}`}
+              {isFree ? "Free" : `₹${product.price}`}
             </div>
           </div>
 
@@ -104,6 +113,8 @@ const Checkout = () => {
                 <Spinner size="sm" animation="border" />
                 Processing…
               </span>
+            ) : isFree ? (
+              "Confirm & Download"
             ) : (
               "Confirm & Pay"
             )}

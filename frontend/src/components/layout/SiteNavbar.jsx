@@ -7,35 +7,51 @@ import { toast } from "react-toastify";
 
 const SiteNavbar = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null); 
+
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true); // FIX: prevent flicker
 
   /* ---------------- CHECK AUTH FROM BACKEND ---------------- */
   useEffect(() => {
+    let isMounted = true;
+
     const checkAuth = async () => {
       try {
-        const res = await api.get("/users/me", { withCredentials: true });
-        setUser(res.data.user);
-      } catch {
-        setUser(null);
+        const res = await api.get("/users/me");
+        if (isMounted) {
+          setUser(res.data.user);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setUser(null);
+        }
+        console.error("Navbar auth check failed:", err);
+      } finally {
+        if (isMounted) {
+          setAuthLoading(false);
+        }
       }
     };
 
     checkAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   /* ---------------- LOGOUT ---------------- */
   const handleLogout = async () => {
-  try {
-    await api.post("/auth/logout", {}, { withCredentials: true });
-    toast.success("Logged out successfully");
-    setUser(null);
-    navigate("/login");
-  } catch {
-    toast.error("Logout failed");
-  }
-};
-
-
+    try {
+      await api.post("/auth/logout");
+      toast.success("Logged out successfully");
+      setUser(null);
+      navigate("/login");
+    } catch (err) {
+      toast.error("Logout failed");
+      console.error("Logout error:", err);
+    }
+  };
 
   return (
     <Navbar
@@ -100,7 +116,7 @@ const SiteNavbar = () => {
 
           {/* RIGHT ACTIONS */}
           <div className="d-flex flex-column flex-lg-row gap-2 mt-3 mt-lg-0">
-            {user ? (
+            {authLoading ? null : user ? (
               <>
                 {user.role === "admin" ? (
                   <Button
