@@ -38,30 +38,14 @@ const Dashboard = () => {
 
   /* ---------------- AUTH + PRODUCTS ---------------- */
   useEffect(() => {
-    const init = async () => {
+    const checkAuth = async () => {
       try {
-        const meRes = await api.get("/users/me");
-        if (!meRes.data?.user) throw new Error("No user");
-
-        setUser(meRes.data.user);
-
-        const prodRes = await api.get("/products/creator/me");
-        setProducts(prodRes.data.products || []);
-      } catch (err) {
-        if (err.response?.status === 401) {
-          navigate("/login");
-        } else if (err.response?.status === 403) {
-          toast.error("Not authorized as creator");
-          navigate("/");
-        } else {
-          toast.error("Failed to load dashboard");
-        }
-      } finally {
-        setPageLoading(false);
+        await api.get("/users/me");
+      } catch {
+        navigate("/login");
       }
     };
-
-    init();
+    checkAuth();
   }, [navigate]);
 
   /* ---------------- CREATE ---------------- */

@@ -11,10 +11,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // CHANGE: redirect if already logged in
   useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) navigate("/");
+    const check = async () => {
+      try {
+        await api.get("/users/me");
+        navigate("/");
+      } catch {}
+    };
+    check();
   }, [navigate]);
 
   const handleLogin = async (e) => {
@@ -27,22 +31,11 @@ const Login = () => {
 
     try {
       setLoading(true);
-
       const res = await api.post("/auth/login", { email, password });
 
       if (res.data.success) {
-        // CHANGE: keep localStorage minimal
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: res.data.user._id,
-            role: res.data.user.role,
-            name: res.data.user.name,
-          })
-        );
-
         toast.success("Login successful");
-        navigate("/"); // CHANGE: no artificial delay
+        navigate("/");
       }
     } catch (err) {
       toast.error(err.response?.data?.msg || "Login failed");

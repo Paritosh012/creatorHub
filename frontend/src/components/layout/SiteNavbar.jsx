@@ -17,7 +17,8 @@ const SiteNavbar = () => {
 
     const checkAuth = async () => {
       try {
-        const res = await api.get("/users/me");
+        const res = await api.get("/users/me", { withCredentials: true });
+
         if (isMounted) {
           setUser(res.data.user);
         }

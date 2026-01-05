@@ -1,4 +1,4 @@
- import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Container, Form, Button, Card, Spinner } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
@@ -12,28 +12,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // CHANGE: redirect if already logged in
-  useEffect(() => {
-    const user = localStorage.getItem("user");
-    if (user) navigate("/");
-  }, [navigate]);
-
   const handleRegister = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
-      toast.error("All fields are required");
-      return;
-    }
-
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return;
-    }
-
     try {
       setLoading(true);
-
       const res = await api.post("/auth/register", {
         name,
         email,
@@ -41,15 +24,6 @@ const Register = () => {
       });
 
       if (res.data.success) {
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: res.data.user._id,
-            role: res.data.user.role,
-            name: res.data.user.name,
-          })
-        );
-
         toast.success("Registration successful");
         navigate("/");
       }
