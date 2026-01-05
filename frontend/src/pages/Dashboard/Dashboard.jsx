@@ -38,14 +38,17 @@ const Dashboard = () => {
 
   /* ---------------- AUTH + PRODUCTS ---------------- */
   useEffect(() => {
-    const checkAuth = async () => {
+    const init = async () => {
       try {
-        await api.get("/users/me");
+        const res = await api.get("/users/me");  
+        setUser(res.data.user);
+        setPageLoading(false);
       } catch {
         navigate("/login");
       }
     };
-    checkAuth();
+
+    init();
   }, [navigate]);
 
   /* ---------------- CREATE ---------------- */
