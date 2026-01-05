@@ -59,7 +59,12 @@ const Dashboard = () => {
   const handleCreateProduct = async () => {
     if (actionLoading) return;
 
-    if (!form.title || !form.description.trim() || !thumbnailFile || !productFile) {
+    if (
+      !form.title ||
+      !form.description.trim() ||
+      !thumbnailFile ||
+      !productFile
+    ) {
       toast.error("All fields and files are required");
       return;
     }
@@ -187,9 +192,7 @@ const Dashboard = () => {
 
   return (
     <Container style={{ paddingTop: 40 }}>
-      <h2 style={{ color: "#fff", fontWeight: 800 }}>
-        Welcome, {user?.name}
-      </h2>
+      <h2 style={{ color: "#fff", fontWeight: 800 }}>Welcome, {user?.name}</h2>
 
       <div className="d-flex gap-2 mt-4">
         <Button onClick={() => setShowModal(true)}>Add Product</Button>
@@ -251,6 +254,10 @@ const Dashboard = () => {
               value={form.title}
               disabled={actionLoading}
               onChange={(e) => setForm({ ...form, title: e.target.value })}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                color: "#fff",
+              }}
             />
 
             <Form.Control
@@ -260,6 +267,10 @@ const Dashboard = () => {
               value={form.price}
               disabled={actionLoading}
               onChange={(e) => setForm({ ...form, price: e.target.value })}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                color: "#fff",
+              }}
             />
 
             <Form.Select
@@ -267,6 +278,10 @@ const Dashboard = () => {
               value={form.category}
               disabled={actionLoading}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
+              style={{
+                background: "rgba(255,255,255,0.06)",
+                color: "#fff",
+              }}
             >
               <option value="ui-kits">UI Kits</option>
               <option value="templates">Templates</option>

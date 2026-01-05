@@ -58,3 +58,6 @@ html, body, #root {
 .form-control:-ms-input-placeholder {
   color: rgba(255, 255, 255, 0.45);
 }
+.form-control::placeholder {
+  color: rgba(255,255,255,0.45);
+}
