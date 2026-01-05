@@ -4,8 +4,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Layout from "./Layout";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home/Home";
-import Explore from "./pages/Explore/Explore";
-import Login from "./pages/Auth/Login";
+import Explore from "./pages/Explore/Explore"; 
 import Register from "./pages/Auth/Register";
 import ProductDetails from "./components/product/ProductsDetails";
 import Checkout from "./pages/Checkout/Checkout";
@@ -13,6 +12,7 @@ import Success from "./pages/Checkout/Success";
 import Admin from "./pages/Admin/Admin";
 import Dashboard from "./pages/Dashboard/Dashboard"; 
 import CreatorProfile from "./pages/Creator/CreatorProfile";
+import Login from "./pages/Auth/Login";
 
 const App = () => {
   return (
@@ -23,7 +23,7 @@ const App = () => {
           <Route index element={<Home />} />
           <Route path="home" element={<Home />} />
           <Route path="explore" element={<Explore />} />
-          <Route path="login" element={<Login />} />
+          <Route path="login" element={<Login/>} />
           <Route path="register" element={<Register />} />
           <Route path="product/:slug" element={<ProductDetails />} />
           <Route path="checkout" element={<Checkout />} />
