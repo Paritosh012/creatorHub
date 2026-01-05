@@ -107,3 +107,23 @@ button {
 .btn-outline-light:hover {
   background: rgba(255, 255, 255, 0.08);
 }
+/* ---------------- DARK GLASS MODAL ---------------- */
+.modal-content {
+  background: linear-gradient(
+    180deg,
+    rgba(11, 15, 25, 0.98),
+    rgba(7, 9, 14, 1)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  color: #ffffff;
+}
+
+.modal-header,
+.modal-footer {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.modal-title {
+  font-weight: 700;
+}
