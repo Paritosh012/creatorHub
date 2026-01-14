@@ -3,7 +3,8 @@ const slug = require("../utils/slug");
 const upload = require("../utils/uploadToCloudinary");
 
 exports.getAll = async (req, res) => {
-  const filter = {};
+  const filter = { status: "published" };
+
   if (req.query.popular === "true") filter.isPopular = true;
   if (req.query.category) filter.category = req.query.category;
 
@@ -15,14 +16,14 @@ exports.getAll = async (req, res) => {
 };
 
 exports.getOne = async (req, res) => {
-  const product = await Product.findOne({ slug: req.params.slug }).populate(
-    "creator",
-    "name"
-  );
+  const product = await Product.findOne({
+    slug: req.params.slug,
+    status: "published",
+  }).populate("creator", "name");
+
   if (!product) return res.status(404).json({ success: false });
 
   const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-
   const now = Date.now();
 
   if (
@@ -41,6 +42,7 @@ exports.getOne = async (req, res) => {
 
   res.json({ success: true, product });
 };
+
 
 exports.getTrendingThisWeek = async (req, res) => {
   const products = await Product.find({ status: "published" })

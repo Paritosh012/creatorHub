@@ -34,9 +34,17 @@ const productSchema = new mongoose.Schema(
 
     weeklyViews: { type: Number, default: 0 },
     weeklyDownloads: { type: Number, default: 0 },
-    lastActivityAt: { type: Date },
+
+    lastViewAt: { type: Date },
+    lastDownloadAt: { type: Date },
   },
   { timestamps: true }
 );
+
+productSchema.index({
+  weeklyDownloads: -1,
+  weeklyViews: -1,
+  createdAt: -1,
+});
 
 module.exports = mongoose.model("Product", productSchema);

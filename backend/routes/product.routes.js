@@ -4,10 +4,14 @@ const upload = require("../middlewares/upload");
 const c = require("../controllers/product.controller");
 
 router.get("/", c.getAll);
+
+// 🔥 Trending MUST come before :slug
+router.get("/trending", c.getTrendingThisWeek);
+
 router.get("/creator/me", verify, c.getByCreator);
 router.get("/:slug", c.getOne);
 
-router.post( 
+router.post(
   "/",
   verify,
   upload.fields([
@@ -28,5 +32,7 @@ router.put(
 );
 
 router.delete("/:id", verify, c.remove);
+
+module.exports = router;
 
 module.exports = router;
