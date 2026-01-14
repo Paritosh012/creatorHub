@@ -31,6 +31,10 @@ const productSchema = new mongoose.Schema(
     views: { type: Number, default: 0 },
     downloads: { type: Number, default: 0 },
     isPopular: { type: Boolean, default: false },
+
+    weeklyViews: { type: Number, default: 0 },
+    weeklyDownloads: { type: Number, default: 0 },
+    lastActivityAt: { type: Date },
   },
   { timestamps: true }
 );

@@ -20,8 +20,41 @@ exports.getOne = async (req, res) => {
     "name"
   );
   if (!product) return res.status(404).json({ success: false });
+
+  const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+  const now = Date.now();
+
+  if (
+    !product.lastActivityAt ||
+    now - product.lastActivityAt.getTime() > SEVEN_DAYS
+  ) {
+    product.weeklyViews = 0;
+    product.weeklyDownloads = 0;
+  }
+
+  product.views += 1;
+  product.weeklyViews += 1;
+  product.lastActivityAt = new Date();
+
+  await product.save();
+
   res.json({ success: true, product });
 };
+
+exports.getTrendingThisWeek = async (req, res) => {
+  const products = await Product.find({ status: "published" })
+    .sort({
+      weeklyDownloads: -1,
+      weeklyViews: -1,
+      createdAt: -1,
+    })
+    .limit(10)
+    .populate("creator", "name");
+
+  res.json({ success: true, products });
+};
+
 
 exports.create = async (req, res) => {
   if (!req.files?.thumbnail || !req.files?.file)
@@ -118,4 +151,3 @@ exports.getByCreator = async (req, res) => {
     });
   }
 };
-
