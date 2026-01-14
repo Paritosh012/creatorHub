@@ -16,12 +16,10 @@ import SkeletonCard from "../../components/common/SkeletonCard";
 const Dashboard = () => {
   const navigate = useNavigate();
 
-  // PAGE STATE
   const [pageLoading, setPageLoading] = useState(true);
   const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
 
-  // MODAL STATE
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -36,7 +34,7 @@ const Dashboard = () => {
   const [thumbnailFile, setThumbnailFile] = useState(null);
   const [productFile, setProductFile] = useState(null);
 
-  /* ---------------- AUTH + LOAD CREATOR PRODUCTS ---------------- */
+  /* ---------------- INIT ---------------- */
   useEffect(() => {
     const init = async () => {
       try {
@@ -45,13 +43,12 @@ const Dashboard = () => {
 
         const prodRes = await api.get("/products/creator/me");
         setProducts(prodRes.data.products || []);
-
-        setPageLoading(false);
-      } catch (err) {
+      } catch {
         navigate("/login");
+      } finally {
+        setPageLoading(false);
       }
     };
-
     init();
   }, [navigate]);
 
@@ -60,7 +57,7 @@ const Dashboard = () => {
     if (actionLoading) return;
 
     if (
-      !form.title ||
+      !form.title.trim() ||
       !form.description.trim() ||
       !thumbnailFile ||
       !productFile
@@ -72,15 +69,15 @@ const Dashboard = () => {
     try {
       setActionLoading(true);
 
-      const fd = new FormData();
       const priceValue = Number(form.price || 0);
 
-      fd.append("title", form.title);
-      fd.append("description", form.description);
+      const fd = new FormData();
+      fd.append("title", form.title.trim());
+      fd.append("description", form.description.trim());
       fd.append("price", priceValue);
-      fd.append("isFree", priceValue === 0);
+      fd.append("isFree", priceValue === 0 ? "true" : "false");
       fd.append("category", form.category);
-      fd.append("tags", form.category);
+      fd.append("tags", JSON.stringify([form.category]));
       fd.append("thumbnail", thumbnailFile);
       fd.append("file", productFile);
 
@@ -113,18 +110,23 @@ const Dashboard = () => {
   const handleUpdateProduct = async () => {
     if (actionLoading) return;
 
+    if (!form.title.trim() || !form.description.trim()) {
+      toast.error("Title and description are required");
+      return;
+    }
+
     try {
       setActionLoading(true);
 
-      const fd = new FormData();
       const priceValue = Number(form.price || 0);
 
-      fd.append("title", form.title);
-      fd.append("description", form.description);
+      const fd = new FormData();
+      fd.append("title", form.title.trim());
+      fd.append("description", form.description.trim());
       fd.append("price", priceValue);
-      fd.append("isFree", priceValue === 0);
+      fd.append("isFree", priceValue === 0 ? "true" : "false");
       fd.append("category", form.category);
-      fd.append("tags", form.category);
+      fd.append("tags", JSON.stringify([form.category]));
 
       if (thumbnailFile) fd.append("thumbnail", thumbnailFile);
       if (productFile) fd.append("file", productFile);
@@ -192,7 +194,9 @@ const Dashboard = () => {
 
   return (
     <Container style={{ paddingTop: 40 }}>
-      <h2 style={{ color: "#fff", fontWeight: 800 }}>Welcome, {user?.name}</h2>
+      <h2 style={{ color: "#fff", fontWeight: 800 }}>
+        Welcome, {user?.name}
+      </h2>
 
       <div className="d-flex gap-2 mt-4">
         <Button onClick={() => setShowModal(true)}>Add Product</Button>
@@ -253,11 +257,9 @@ const Dashboard = () => {
               placeholder="Title"
               value={form.title}
               disabled={actionLoading}
-              onChange={(e) => setForm({ ...form, title: e.target.value })}
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                color: "#fff",
-              }}
+              onChange={(e) =>
+                setForm({ ...form, title: e.target.value })
+              }
             />
 
             <Form.Control
@@ -266,22 +268,18 @@ const Dashboard = () => {
               placeholder="Price (0 = free)"
               value={form.price}
               disabled={actionLoading}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                color: "#fff",
-              }}
+              onChange={(e) =>
+                setForm({ ...form, price: e.target.value })
+              }
             />
 
             <Form.Select
               className="mb-2"
               value={form.category}
               disabled={actionLoading}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-              style={{
-                background: "rgba(255,255,255,0.06)",
-                color: "#fff",
-              }}
+              onChange={(e) =>
+                setForm({ ...form, category: e.target.value })
+              }
             >
               <option value="ui-kits">UI Kits</option>
               <option value="templates">Templates</option>
@@ -314,6 +312,12 @@ const Dashboard = () => {
               disabled={actionLoading}
               onChange={(e) => setProductFile(e.target.files[0])}
             />
+
+            {editingId && (
+              <small className="text-muted">
+                Leave files empty to keep existing ones
+              </small>
+            )}
           </Form>
         </Modal.Body>
 
