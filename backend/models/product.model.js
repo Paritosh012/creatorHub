@@ -31,20 +31,8 @@ const productSchema = new mongoose.Schema(
     views: { type: Number, default: 0 },
     downloads: { type: Number, default: 0 },
     isPopular: { type: Boolean, default: false },
-
-    weeklyViews: { type: Number, default: 0 },
-    weeklyDownloads: { type: Number, default: 0 },
-
-    lastViewAt: { type: Date },
-    lastDownloadAt: { type: Date },
   },
   { timestamps: true }
 );
-
-productSchema.index({
-  weeklyDownloads: -1,
-  weeklyViews: -1,
-  createdAt: -1,
-});
 
 module.exports = mongoose.model("Product", productSchema);
